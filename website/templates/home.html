@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Homepage{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+
+{% if user is defined and user.firstName|length %}
+<h1>
+Greetings, <i>{{user.firstName}}</i>!
+</h1>
+{% else %}
+<h1>Welcome to Evernote in 2005</h1>
+{%endif %}
+
+</div>
+
+{% endblock %}
