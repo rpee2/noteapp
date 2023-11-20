@@ -1,0 +1,105 @@
+{% extends 'base.html' %} {% block title %} 404 {% endblock %} {% block
+insert_head_here %}
+<style>
+  .bg-404 {
+    background: url("{{url_for('static', filename= '/img/404.gif')}}") no-repeat;
+  }
+  
+  .bg-500 {
+    background: url("{{url_for('static', filename= '/img/500.jpg')}}") no-repeat;
+  }
+
+  .background {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+    background-position: bottom right;
+    background-color: var(--background);
+  }
+
+  .svg-container {
+    position: absolute;
+    top: 25%;
+    display: flex;
+    height: 75%;
+    width: 100%;
+    align-items: center;
+    flex-direction: column;
+    gap: 1vw;
+  }
+
+  .title {
+    height: 200px;
+    width: 100%;
+    font: 20rem Tomorrow;
+    font-weight: 700;
+  }
+
+  h1 {
+    position: relative;
+    color: white;
+    backdrop-filter: blur(10px);
+    background: hsla(0, 0%, 100%, 0.3);
+    clip-path: url(#mask-path);
+  }
+
+  .subtitle {
+    height: 50px;
+    width: 100%;
+    font: 3.6rem Tomorrow;
+    font-weight: 700;
+  }
+
+  p {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  svg {
+    mix-blend-mode: difference;
+  }
+
+  .subtitle:hover svg text a {
+    fill: hsl(177, 74%, 49%);
+  }
+</style>
+
+{% endblock %} {% block content %}
+<div class="background {{'bg-404' if e == '404' else 'bg-500'}}">
+  <div class="svg-container">
+    <h1 class="title">
+      <svg id="mask-title" class="title">
+        <clipPath id="mask-path">
+          <text
+            dominant-baseline="hanging"
+            text-anchor="middle"
+            x="50%"
+            y="0em"
+            dy="0.125em"
+          >
+            {{'404' if e == '404' else '500'}}
+          </text>
+        </clipPath>
+      </svg>
+    </h1>
+    <p class="subtitle">
+      <svg id="svg-subtitle" class="subtitle">
+        <text
+          dominant-baseline="hanging"
+          text-anchor="middle"
+          x="50%"
+          y="0em"
+          dy="0.125em"
+          fill="hsla(0,0%,100%,1)"
+        >
+          {% if e == '404' %} "This place ain't on the map, punk. Where to,
+          <a href="{{url_for('views.home')}}">HOME</a>
+          ?" {% else %} "System's glitching. We ain't going nowhere till it's back" {% endif %}
+        </text>
+      </svg>
+    </p>
+  </div>
+</div>
+{% endblock %}

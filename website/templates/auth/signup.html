@@ -1,0 +1,353 @@
+{% extends "base.html" %} {% block title %}Signup{% endblock %} {% block
+insert_head_here %}
+<style>
+  .signup-wrapper {
+    display: flex;
+    width: 700px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    background: transparent;
+    backdrop-filter: blur(4em);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    color: var(--text);
+  }
+  
+  :root[data-theme="dark"] .signup-wrapper {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+  
+  /* wrap the blob element in a duplicate wrapper because if I put everything in the same div, the backdrop filter (above) won't work */
+  .signup-wrapper:nth-child(2) {
+    position: absolute;
+    z-index: -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 500px;
+    width: 700px;
+    border: 0;
+    overflow: hidden;
+  }
+
+  .signup-form {
+    width: 420px;
+    padding: 0px 40px 30px 40px;
+  }
+
+  /* Same thing I'm wrapping the image in a div so that I can create the effect where the image is spilling out of the div. Also, the hard-light blend mode really makes it look like the image is glowing. */
+  .signup-image {
+    display: flex;
+    justify-content: center;
+    width: 280px;
+    border-radius: 0 10px 10px 0;
+    /* border-left: 1px solid #ffffff7f; */
+    /* background-color: hsla(247, 54%, 41%, 0.2); */
+    background-color: hsla(322, 100%, 50%, 0.357);
+    background-blend-mode: hard-light; 
+  }
+
+  .signup-image h1 {
+    position: absolute;
+    top: 25px;
+    z-index: 1;
+    font-family: Tomorrow;
+    color: var(--primary);
+    mix-blend-mode: color-dodge;
+    text-align: center;
+    font-size: 4.8rem;
+    font-weight: bolder;
+    font-variant: small-caps;
+  }
+
+  .signup-image img {
+    position: absolute;
+    bottom: 0;
+    right: -30px;
+    height: 450px;
+    width: auto;
+  }
+
+  .blob-container svg {
+    height: 800px;
+    width: 1200px;
+  }
+
+  dialog.tos-dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    max-height: 50%;
+    width: 50%;
+    transform: translate(-50%, -50%);
+    padding: 1em;
+    border: none;
+    box-shadow: 0 0 15px var(--text);
+    background-color: var(--background);
+    color: var(--text);
+    backdrop-filter: blur(5em);
+    font-size: 1.4rem;
+  }
+
+  dialog .tos-buttons {
+    display: flex;
+    justify-content: end;
+  }
+
+  dialog .tos-close,
+  dialog .tos-accept {
+    display: block;
+    float: right;
+    padding: 0.5em;
+    margin: 1em;
+    border: 1px solid;
+    border-radius: 5px;
+    background: transparent;
+    font-size: 1.6rem;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  dialog .tos-close {
+    border-color: hsl(358, 98%, 60%);
+  }
+  dialog .tos-accept {
+    border-color: hsl(146, 98%, 50%);
+  }
+
+  /* https://stackoverflow.com/a/26245056 */
+  ol {
+    counter-reset: item;
+    list-style-type: none;
+  }
+
+  ol > li {
+    display: table;
+    counter-increment: item;
+    margin-bottom: 0.6em;
+  }
+  
+  ol > li::before {
+    content: counters(item, ".")".";
+    display: table-cell;
+    padding-right: 0.6em;  
+  }
+
+  li ol > li {
+  margin: 0;
+  }
+
+  li ol > li:before {
+  content: counters(item, ".") " ";
+  }
+</style>
+
+{% endblock %} {% block content %}
+<div class="container">
+  <div class="wrapper signup-wrapper">
+    <div class="signup-form">
+      <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="input-box">
+          {{ form.email(placeholder="Email") }}
+          <i class="bx bxs-envelope"></i>
+        </div>
+        <div class="input-box">
+          {{ form.name(placeholder="Name") }}
+          <i class="bx bxs-user"></i>
+        </div>
+        <div class="input-box">
+          {{ form.new_password(placeholder="Password") }}
+          <i class="bx bxs-lock-alt"></i>
+        </div>
+        <div class="input-box">
+          {{ form.confirm_password(placeholder="Confirm Password") }}
+          <i class="bx bxs-lock-alt"></i>
+        </div>
+        <div class="input-checkbox">  
+          {{ form.hasBeta(id="cb-beta") }}
+          <label for="cb-beta"> Enable Quantum Precognition </label>
+        </div>
+        <div class="input-checkbox">
+          <input type="checkbox" name="checkedTos" id="cb-tos" />
+          <label for="cb-tos"> I have read and agree to the <a href="#" id="js-tos-dialog-link" type="button">ToS</a></label>
+        </div>
+        {{ form.submit(class="button") }}
+      </form>
+    </div>
+    <div class="signup-image">
+      <h1>ByteMemo</h1>
+      <img
+        src="{{ url_for('static', filename ='img/cybernetic-girl.png') }}"
+        alt=""
+      />
+    </div>
+  </div>
+
+  <div class="signup-wrapper">
+    <div class="blob-container">
+      <svg
+        viewBox="0 0 500 500"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        preserveAspectRatio="none"
+      >
+        <path
+          id="blob1"
+          d="M416,309.5Q436,369,373,375Q310,381,269,391Q228,401,180,393.5Q132,386,79.5,350.5Q27,315,29.5,250.5Q32,186,72.5,139Q113,92,171.5,102.5Q230,113,279,96Q328,79,374,110Q420,141,408,195.5Q396,250,416,309.5Z"
+          fill=""
+        />
+        <path
+          id="blob2"
+          style="visibility: hidden"
+          d="M407.5,299.5Q368,349,320,362Q272,375,201.5,415.5Q131,456,92,389Q53,322,80.5,260Q108,198,128,135.5Q148,73,220.5,40Q293,7,351,61.5Q409,116,428,183Q447,250,407.5,299.5Z"
+          fill=""
+        />
+      </svg>
+    </div>
+  </div>
+
+</div>
+<dialog class="tos-dialog" id="js-tos-dialog">
+  <h1>Terms of Service</h1>
+  <p>
+    By accessing or using our services, you willingly submit to and embrace the
+    following terms:
+  </p>
+
+  <ol>
+    <li>
+      User Conduct in the Metropolis
+      <ol>
+        <li>
+          Corporate Compliance: Users shall adhere to the Corporate Compliance
+          Directive at all times and shall not engage in activities contrary to
+          the will of CyberByte and/or the Metropolis.
+        </li>
+        <li>
+          Data Synergy: Users must not engage in any activity that disrupts the
+          seamless flow of data or compromises the synergy of the Metropolis.
+        </li>
+      </ol>
+    </li>
+    <li>
+      Cybernetics and Neural Interfacing
+      <ol>
+        <li>
+          Synaptic Ownership: Users retain nominal ownership of their notes. By
+          utilizing ByteMemo, users grant CyberByte an irrevocable license to
+          assimilate, enhance, and propagate the neural content for the
+          furtherment of the Metropolis.
+        </li>
+        <li>
+          Thought Encryption: Users must safeguard their cybernetic identities
+          with ByteCrypt Protocol(Red/Delta) 293 or equivalent. CyberByte
+          disclaims liability for any unauthorized synaptic interactions.
+        </li>
+      </ol>
+    </li>
+    <li>
+      Quantum Precognition
+      <ol>
+        <li>
+          Our app includes an experimental feature known as "Quantum
+          Precognition." This feature allows users to explore and interact with
+          a futuristic capability that simulates the retrieval of thoughts or
+          information from potential future timelines.
+        </li>
+        <li>
+          Users understand and acknowledge that Quantum Precognition is an
+          experimental feature, and its accuracy, reliability, and outcomes are
+          subject to the unpredictable nature of quantum mechanics and
+          speculative technology.
+        </li>
+        <li>
+          Opt-In Participation: Use of Quantum Precognition is entirely
+          optional, and users may choose to opt-in or opt-out at any time.
+        </li>
+        <li>
+          Dangers: Users are cautioned that prolonged or intensive use of
+          Quantum Precognition may potentially contribute to a phenomenon known
+          as cyberpsychosis. Cyberpsychosis refers to a mental health condition
+          characterized by a detachment from reality, heightened aggression, or
+          other adverse effects resulting from extensive engagement with
+          advanced technologies.
+        </li>
+        <li>
+          Indemnification: Users agree to indemnify and hold harmless CyberByte
+          from any claims, damages, or liabilities arising from the use of
+          Quantum Precognition.
+        </li>
+      </ol>
+    </li>
+    <li>
+      Privacy Policy
+      <ol>
+        <li>
+          Data Encryption: We employ SHAGGER data encryption algorithms to
+          protect user data. For details, refer to our Quantum Privacy
+          Encryption Manifesto.
+        </li>
+        <li>
+          Quantum Secure Transmissions: While we uphold quantum-level security,
+          users are advised to embrace quantum vigilance and take responsibility
+          for their digital existence.
+        </li>
+        <li>
+          Consent: In the spirit of transparency, we ensure that data
+          contributions remain an integral yet discreet aspect of the ByteMemo
+          experience. Users are encouraged to decrypt the nuances of our Quantum
+          Privacy Encryption Manifesto for a more comprehensive understanding.
+        </li>
+      </ol>
+    </li>
+    <li>
+      Safeguard Protocols and the Jurisdiction
+      <ol>
+        <li>
+          In the interests of the Metropolis, CyberByte retains the sovereign
+          right to evolve or dissolve ByteMemo or any neural feature at any
+          quantum moment without forewarning.
+        </li>
+        <li>
+          CyberByte reserves the right to terminate or suspend user accounts and
+          access to the app for violations of these Terms of Service.
+        </li>
+        <li>
+          These Terms of Service are governed by the Jurisdiction as established 
+          by the provisions outlined in Metropolis Act Red/2252, Sections 16-18. 
+        </li>
+      </ol>
+    </li>
+  </ol>
+  <div class="tos-buttons">
+    <button class="tos-close" type="button" id="js-tos-dialog-close">Reject</button>
+    <button class="tos-accept" type="button" id="js-tos-dialog-close">Accept</button>
+  </div>
+</dialog>
+
+
+{% endblock %} {% block insert_script_here %}
+<script>
+  const tosDialog = document.getElementById("js-tos-dialog");
+
+  const tosLink = document.getElementById("js-tos-dialog-link");
+  tosLink.addEventListener("click", () => {
+    tosDialog.showModal();
+  });
+
+  const closeTosDialog = document.getElementById("js-tos-dialog-close");
+  closeTosDialog.addEventListener("click", () => {
+    tosDialog.close();
+  })
+
+  var tween = KUTE.fromTo(
+    "#blob1",
+    { path: "#blob1", attr:{fill: "#9e98d1"} },
+    { path: "#blob2", attr:{fill: "#ff00a3"} },
+    { repeat: 999, duration: 12000, yoyo: true, easing: 'easingCubicIn' }
+  ).start();
+</script>
+
+{% endblock %}

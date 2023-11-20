@@ -1,0 +1,875 @@
+/* https://github.com/necolas/idiomatic-css  */
+/* https://css-tricks.com/poll-results-how-do-you-order-your-css-properties/  */
+/* https://stackoverflow.com/questions/49293327/what-is-the-standard-css-container-size-in-2018  */
+/* https://uxplanet.org/everything-you-should-know-about-8-point-grid-system-in-ux-design-b69cb945b18d */
+
+:root {
+  /* xs: 0, 
+  sm: 600px, // mobile landscape, tablet (portrait)
+  md: 1024px, // chromebooks, ipad pro (portrait), tablet (landscape)
+  lg: 1600px, // most laptops and desktops
+  xl: 2048px // 2k and up */
+  --breakpoint-xs: 0;
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 1024px;
+  --breakpoint-lg: 1600px;
+  --breakpoint-xl: 2048px;
+
+  --container-max-width-xs: 480px;
+  --container-max-width-sm: 960px;
+  --container-max-width-md: 1280px;
+  --container-max-width-lg: 1920px;
+  --container-max-width-xl: 3840px;
+}
+
+:root[data-theme="light"] {
+  /* --text: hsl(0, 0%, 2%); */
+  --text: hsl(45, 8%, 20%);
+  --background: hsl(210, 20%, 98%);
+  --primary: hsl(247, 54%, 41%);
+  --primary-h: 247;
+  --primary-s: 54%;
+  --primary-l: 41%;
+  --secondary: hsl(240, 3%, 85%);
+  --accent: hsl(322, 100%, 50%);
+}
+:root[data-theme="dark"] {
+  --text: hsl(0, 0%, 83%);
+  --background: hsl(210, 20%, 2%);
+  --primary: hsl(247, 54%, 59%);
+  --primary-h: 247;
+  --primary-s: 54%;
+  --primary-l: 59%;
+  /* --secondary: hsl(240, 3%, 15%); */
+  --secondary: hsl(240, 3%, 20%);
+  --accent: hsl(322, 100%, 50%);
+}
+
+.test {
+
+  color: #6b5ecf;
+  color: #ff00a2;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 62.5%; /* default 16px * 0.625 = 10px */
+  font-family: "Poppins";
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--background);
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px;
+  /* background: url("../img/glass-bg.jpg") no-repeat;
+  background-size: cover;
+  background-position: center; */
+  /* background: radial-gradient(
+      circle at 94.02% 88.03%,
+      #3D30A2,
+      transparent 100%
+    ),
+    radial-gradient(circle at 25.99% 27.79%, #ff00a3, transparent 100%),
+    radial-gradient(circle at 50% 50%, #8c8c8c, #8c8c8c 100%); */
+  /* background-image: linear-gradient(
+      to right bottom,
+      #3d30a2,
+      #4838ac,
+      #5241b6,
+      #5d49c0,
+      #6752ca
+    ); */
+}
+
+/* --------------------------------- sidebar --------------------------------  */
+.sidebar {
+  position: fixed;
+  z-index: 3;
+  height: 100vh;
+  width: 280px;
+  border-right: 2px solid hsl(0, 5%, 85%);
+  padding: 0.5em 0;
+  background-color: hsl(0, 0%, 97%);
+  transform: translateX(-280px);
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.65, 0.05, 0.36, 1);
+}
+
+:root[data-theme="dark"] .sidebar {
+  border-right: 2px solid hsl(0, 5%, 15%);
+  background-color: hsl(0, 0%, 3%);
+}
+
+.sidebar.sidebar-with-tags {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+nav.nav-top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin: 0 0 0.5em 0.5em;
+  font-family: "Tomorrow";
+  font-size: 1.4rem;
+}
+
+nav button,
+nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  color: var(--text);
+  text-decoration: none;
+  font-family: "Poppins";
+  font-size: 1.4rem;
+}
+
+#logo {
+  margin: 0em 0.5em 0.8em 0.5em;
+  font-size: 1.8rem;
+  font-family: Tomorrow;
+  font-weight: 700;
+}
+
+nav a img {
+  height: 2.5em;
+  width: 2.5em;
+}
+
+.toolbar-tag {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.5em;
+  align-items: center;
+  margin-right: 0.5em;
+  padding: 0 0.5em;
+  color: var(--text);
+}
+
+.toolbar-tag button {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+}
+
+nav.nav-bottom {
+  display: grid;
+  grid-template-areas:
+    "g1 . l"
+    "g2 . l";
+  grid-template-columns: auto 1fr auto;
+  gap: 1em;
+  margin: 0 1.5em;
+}
+
+
+.nav-bottom .grid-1 {
+  grid-area: g1;
+  border: none;
+  background-color: transparent;
+}
+
+.nav-bottom .grid-2 {
+  grid-area: g2;
+}
+
+/* dark mode button */
+
+nav label {
+  grid-area: l;
+  align-self: center;
+  width: 3.5em;
+  height: 3.5em;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+nav label input {
+  position: absolute;
+  opacity: 0;
+}
+
+nav .bxs-moon {
+  font-size: 2.5rem;
+  color: hsl(0, 0%, 82%);
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+  transition: 1s ease;
+}
+
+nav .bxs-sun {
+  position: absolute;
+  font-size: 2.5rem;
+  color: hsl(0, 0%, 28%);
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.2));
+  transform: scale(0);
+  transition: 1s ease;
+}
+
+nav label input:checked ~ .bxs-moon {
+  transform: rotate(360deg) scale(0);
+}
+
+nav label input:checked ~ .bxs-sun {
+  transition-delay: 0.2s;
+  transform: scale(1) rotate(360deg);
+}
+
+nav .bg-toggle {
+  position: absolute;
+  z-index: -1;
+  display: block;
+  width: 3.5em;
+  height: 3.5em;
+  background: hsl(210, 20%, 2%);
+  border-radius: 50%;
+  box-shadow: inset 0 8px 560px rgba(0, 0, 0, 0.1),
+    inset 0 8px 8px rgba(0, 0, 0, 0.1), inset 0 -4px -4px rgba(0, 0, 0, 0.1);
+}
+
+nav label input:checked ~ .bg-toggle {
+  background: hsl(210, 20%, 98%);
+}
+
+/* button for closing and opening sidebar  */
+.menu-button-group {
+  position: fixed;
+  z-index: 3;
+  width: 3em;
+  height: 3em;
+  margin: 1em;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.menu-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: inherit;
+  height: inherit;
+  /* background-color: var(--background); */
+  color: var(--text);
+  /* border: 2px solid; */
+  border-radius: 50%;
+  text-align: center;
+}
+
+.menu-button:hover {
+  transition-duration: 0.3s;
+}
+
+.menu-button:not(.close):hover {
+  transform: translateX(5px);
+}
+
+.menu-button span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  z-index: 3;
+  font-size: 2.5rem;
+  transform: translate(-50%, -50%);
+}
+
+.menu-button span i:nth-child(2) {
+  display: none;
+}
+
+.menu-button.close {
+  z-index: -1;
+}
+
+/* 
+how the closing and opening of the sidebar works: 
+1) Before sidebar is clicked, the sidebar is moved -280px (it is 280px wide), the button group is at the left of the screen (0px), >> is showing and << is nowhere to be found. 
+2) When sidebar is clicked, the sidebar moves from -280 to 0px, the button-group moves from 0 to 220px (inside the sidebar so it doesn't clash with outside elements - also it looks cool), the << (which is the child element of #sidebar NOT #close-sidebar) is now showing and >> is removed. But since we put #close-sidebar on top of #sidebar, it will cover everything and you won't see the icons. So what we do is to make background transparent. 
+3) There is another layer to this, which I briefly alluded to. first, #close-sidebar z-index is -1 so when you click the menu, you are clicking #sidebar. After you click #sidebar and the sidebar is open, #close-sidebar z-index is 1, which puts it on top of #sidebar. So when you click on the menu now to close it, you are clicking #close-sidebar! And when you click on #close-sidebar, there's no actual #close-sidebar:target. Instead, this link is designed to remove the target set by #sidebar.
+*/
+.sidebar:target {
+  transform: translateX(0px);
+}
+
+/* if we simply do a rotate 180deg for this we don't need 2 child elements but i'm leaving it here as practice. and also if the icons are different then we need this technique anyway */
+.sidebar:target ~ .menu-button-group {
+  transform: translateX(230px);
+}
+.sidebar:target ~ .menu-button-group span i:nth-child(1) {
+  display: none;
+}
+.sidebar:target ~ .menu-button-group span i:nth-child(2) {
+  display: block;
+}
+.sidebar:target ~ .menu-button-group .close {
+  z-index: 5;
+  background-color: transparent;
+}
+
+/* ---------------------choosing the tags in sidebar--------------------------  */
+
+.sidebar-form {
+  display: inline-flex;
+  flex-direction: column;
+  /* https://stackoverflow.com/questions/54652771/justify-content-flex-end-and-flex-direction-column-are-not-working-together */
+  /* justify-content: flex-end; */
+  overflow-y: auto;
+}
+
+.sidebar-form ~ button {
+  margin: 0.25em 1em 1em 1em;
+  border-radius: 8px;
+  border-style: none;
+  height: 2.5em;
+  background-color: var(--primary);
+  color: white;
+  font-family: Tomorrow;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 100ms ease-out;
+}
+
+.sidebar-form ~ button:hover,
+.sidebar-form ~ button:focus {
+  opacity: 0.95;
+}
+
+.sidebar-tags {
+  /* KIV we can do an accordion for this, shift the left margin a bit to allow for the accordion button  */
+  border-top: 2px solid hsl(220, 6%, 91%);
+  /* this is in between the individual tags and the tag container  */
+  /* top right bottom left  */
+  /* this padding here interacts with the .tag-selector label margin (0.25+0.25=0.5em all around) */
+  padding: 0.25em 0.25em 0.25em 0.25em;
+
+  font-family: Tomorrow;
+  font-style: italic;
+  font-size: 1.4rem;
+  line-height: 1.6rem;
+}
+
+:root[data-theme="dark"] .sidebar-tags {
+  border-top: 2px solid hsl(220, 6%, 09%);
+}
+
+.tag-checkbox {
+  /* position: relative; */
+  width: 100%;
+  margin: 0;
+  /* the inherited em messes up the radius so i need rem for this  */
+  padding: 0;
+  font-family: Tomorrow;
+  font-style: italic;
+  font-size: 1.4rem;
+}
+
+.tag-checkbox.level-2 {
+  padding-left: 1em; /* sometimes there's a code which does everything in one line and this is it  */
+}
+
+/* label take ups the whole width of the div containing both label and input checkbox -> when you click anywhere on the div, it will check the form, but at the same time, if the length of the label is long it will overflow into the input checkbox */
+.tag-checkbox label {
+  position: relative;
+  z-index: 2;
+  display: block;
+  overflow: hidden;
+  /* this margin here interacts with the .tag-container padding  */
+  margin: 0.25em;
+  padding: 0.5em 0.5em;
+  /* the inherited em messes up the radius so i need rem for this  */
+  border-radius: 0.3rem;
+  /* color: #3c454c; */
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  /* i have transition for hover which changes background-color and for checked which changes color, this is how we put both */
+  transition: background-color 0.1s ease-out, color 0.3s ease-out;
+}
+
+.tag-checkbox label:hover {
+  /* background-clip: border-box; */
+  background-color: hsla(
+    var(--primary-h),
+    var(--primary-s),
+    var(--primary-l),
+    0.15
+  );
+}
+
+/* the input and label are siblings and ~ targets a sibling element. */
+/* .level2-tag-selector input:checked ~ label {
+} */
+
+/* 1a this is a small circle which expands after clicking the checkbox which changes the whole color of the tag. We insert it BEFORE the label element. position absolute means it is exactly where the label element is, but with opacity 0. then we translate it left and up. */
+.tag-checkbox label::before {
+  position: absolute;
+  z-index: -1;
+  right: 0;
+
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+
+  /* background-color: hsla(247, 54%, 80%, 0.8); */
+  background-image: linear-gradient(
+    to left,
+    hsla(60, 100%, 45%, 0.6),
+    hsla(92, 82%, 65%, 0.6),
+    hsla(145, 81%, 64%, 0.6),
+    hsla(172, 100%, 45%, 0.6),
+    hsla(183, 77%, 54%, 0.6)
+  );
+  /* background-image: linear-gradient(to right bottom, #e8e800, #a0ef5c, #59ee98, #00e7c8, #30dce4); */
+  opacity: 0;
+  content: "";
+
+  transform: translate(-50%, -50%) scale3d(1, 1, 1);
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 1b when the input is clicked, increase the scale of label::before 56 times, based on the transition specified above  */
+/* try to change the scale3d values to (20,20,1), you will see what the label before is  */
+/* https://stackoverflow.com/questions/50570281/setting-width-100-in-scale3d  */
+.tag-checkbox input:checked ~ label::before {
+  transform: translate(-50%, -50%) scale3d(56, 56, 1);
+  opacity: 1;
+}
+
+/* 2a */
+/* checkbox hack - this is a circle that is pretending to be the checkbox, we insert it AFTER the label element  */
+.tag-checkbox label::after {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 20px;
+
+  width: 1em;
+  height: 1em;
+  border: 2px solid var(--background);
+  border-radius: 50%;
+  background-color: var(--background);
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.414 11L4 12.414l5.414 5.414L20.828 6.414 19.414 5l-10 10z' fill='%23fff' fill-rule='nonzero'/%3E%3C/svg%3E ");
+  background-repeat: no-repeat;
+  background-position: -3px -2px; /* why is it so hard to work with svg  */
+  content: "";
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: all 300ms ease-in;
+}
+
+:root[data-theme="dark"] .tag-checkbox label::after {
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.414 11L4 12.414l5.414 5.414L20.828 6.414 19.414 5l-10 10z' fill='%23000' fill-rule='nonzero'/%3E%3C/svg%3E ");
+} /* what I changed is the fill  */
+
+/* 2b */
+.tag-checkbox input:checked ~ label::after {
+  border-color: var(--accent);
+  background-color: var(--accent);
+}
+
+/* this is the actual checkbox which we put right on top of the decorator, and we hide it */
+.tag-checkbox input {
+  position: absolute;
+  z-index: 2;
+  
+  right: 20px;
+  top: 50%;
+
+  visibility: hidden;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  /* move it up  */
+  transform: translateY(-50%);
+}
+
+
+/* -------------- popover ------------ */
+
+.sidebar-popover {
+  position: absolute;
+  top: 100%;
+  left: 125px;
+  border: 2px solid var(--text);
+  background-color: var(--background);
+  color: var(--text);
+
+  overflow: visible;
+  transform: translateY(calc(-100% - 6.4em));
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* .sidebar-popover:popover-open {
+  opacity: 1;
+} */
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* this is the 'tip' of the tooltip https://stackoverflow.com/questions/5623072/how-can-i-create-a-tooltip-tail-using-pure-css */
+.sidebar-popover::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 25%;
+  bottom: -9px;
+  height: 14px;
+  width: 14px;
+  border-color: var(--text);
+  border-width: 2px;
+  border-style: none solid solid none;
+  background-color: hsl(0, 0%, 100%);
+  transform: rotate(45deg);
+}
+
+:root[data-theme="dark"] .sidebar-popover::before {
+  background-color: hsl(0, 0%, 0%);
+}
+
+.sidebar-popover ul {
+  list-style-type: none;
+}
+
+.sidebar-popover li {
+  padding: 1.2em;
+}
+
+.sidebar-popover li a {
+  display: block;
+}
+
+.sidebar-popover li:hover,
+.sidebar-popover li:focus {
+  background-color: var(--secondary);
+}
+
+dialog::backdrop {
+  background-color: hsla(0, 0%, 0%, 0.3);
+}
+
+/* --------------- login / signup / change password / account details forms ------------------ */
+
+.blob-container,
+.blob-container-blur {
+  position: absolute;
+  z-index: -1;
+  text-align: "center";
+}
+
+/* If a blob container does not have any siblings, and we try to use nth-child, it blurs itself which I don't want to happen. Anyway I decided not to use this filter effect because the form alredy blurs the blob. I don't want to have another blur effect. */
+.blob-container-blur:nth-child(2) {
+  filter: blur(15px);
+}
+
+.wrapper {
+  position: relative;
+  width: 420px;
+  padding: 30px 40px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4em);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+}
+
+.wrapper h1 {
+  font-size: 3.6rem;
+  text-align: center;
+}
+.wrapper h2 {
+  font-size: 3.2rem;
+  text-align: center;
+}
+
+.input-box {
+  position: relative;
+  height: 50px;
+  width: 100%;
+  margin: 30px 0;
+}
+
+.input-box input {
+  height: 100%;
+  width: 100%;
+  border: 2px solid hsla(0, 0%, 0%, 0.1);
+  border-radius: 40px;
+  outline: none; /* outline when you click on the box  */
+  background: hsla(0, 0%, 100%, 0.5);
+  color: var(--text);
+  font-size: 1.6rem;
+  padding: 20px 45px 20px 20px;
+}
+
+:root[data-theme="dark"] .input-box input {
+  background: hsla(0, 0%, 0%, 0.3);
+}
+
+.input-box input::placeholder {
+  color: var(--text);
+}
+
+.input-box input:focus {
+  background: var(--background);
+}
+
+:root[data-theme="dark"] .input-box input:focus {
+  background: var(--background);
+}
+
+/* eva icons are svg, font awesome and boxicon icons are i  */
+.input-box svg,
+.input-box i {
+  position: absolute;
+  /* technically you can trial and error until it gets centered but top + transform is way more intuitive  */
+  top: 50%;
+  transform: translateY(-50%);
+  right: 20px;
+  font-size: 2rem;
+}
+
+/* .wrapper .forget-link {
+  display: flex;
+  justify-content: flex-end;
+  margin: -15px 0 15px 0;
+  font-size: 1.45rem;
+}
+
+.forget-link a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.forget-link a:hover {
+  text-decoration: underline;
+} */
+
+/* checkbox */
+.signup-wrapper .input-checkbox {
+  display: flex;
+  margin: 0 0 15px;
+  font-size: 1.45rem;
+}
+
+.signup-wrapper .input-checkbox:hover {
+  /* i need to put this because the background contrast with the text is not good  */
+  width: fit-content;
+  border-radius: 40px;
+  padding: 0 0.5em;
+  background: hsla(0, 0%, 100%, 0.3);
+  outline: none; /* outline when you click on the box  */
+}
+
+:root[data-theme="dark"] .signup-wrapper .input-checkbox:hover {
+  background: hsla(0, 0%, 0%, 0.3);
+}
+
+.input-checkbox input {
+  accent-color: hsl(146, 98%, 50%);
+  margin-right: 0.5em;
+}
+
+/* ____________ checkbox hack to modify the checkbox in account-settings.html _____________*/
+.wrapper .hidden-checkbox {
+  position: relative;
+  display: flex;
+  height: 50px;
+  width: 100%;
+  margin: 15px 0;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 1.6rem;
+}
+
+.hidden-checkbox input {
+  order: 1;
+  z-index: 2;
+  position: absolute;
+  height: 50px;
+  width: 50px;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.hidden-checkbox .pseudo-checkbox {
+  position: relative;
+  order: 2;
+  height: 50px;
+  width: 50px;
+  margin-right: 1em;
+  border: 2px solid #e2e2e3;
+  border-radius: 50%;
+  background-color: #fff;
+  transition: all 0.1s;
+}
+
+/* .input-checkbox .pseudocheckbox:hover, */
+.hidden-checkbox:hover .pseudo-checkbox {
+  box-shadow: 0 0 0 5px hsl(0, 0%, 93%, 0.5);
+}
+
+.hidden-checkbox .pseudo-checkbox i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3.6rem;
+  font-weight: bold;
+  color: #eee;
+  transition: all 0.3s cubic-bezier(0.755, 0.05, 0.855, 0.06);
+}
+
+.hidden-checkbox input:checked ~ .pseudo-checkbox i {
+  color: rgb(59, 227, 59);
+}
+
+.hidden-checkbox label {
+  order: 3;
+}
+
+.wrapper .button {
+  height: 45px;
+  width: 100%;
+  border: none;
+  border-radius: 40px;
+  outline: none;
+  box-shadow: 0 0 10px hsla(0, 0%, 0%, 0.1);
+  background-color: hsla(0, 0%, 100%, 0.95);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+
+:root[data-theme="dark"] .wrapper .button {
+  box-shadow: 0 0 10px hsla(0, 0%, 100%, 0.1);
+  background-color: hsla(0, 0%, 0%, 0.85);
+}
+
+.wrapper .button:hover,
+.wrapper .button:focus {
+  background-color: hsla(0, 0%, 100%, 0.85);
+}
+
+:root[data-theme="dark"] .wrapper .button:hover,
+:root[data-theme="dark"] .wrapper .button:focus {
+  background-color: hsla(0, 0%, 0%, 0.95);
+}
+
+.wrapper .button-delete {
+  margin: 30px 0 0 0;
+}
+
+.wrapper .button-delete:hover {
+  background-color: hsl(358, 97%, 70%);
+}
+
+:root[data-theme="dark"] .wrapper .button-del:hover {
+  background-color: hsl(358, 97%, 30%);
+}
+
+.wrapper .signup-link {
+  margin: 20px 0 15px;
+  font-size: 1.45rem;
+  text-align: center;
+}
+
+.wrapper .signup-link p a {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.wrapper .signup-link p a:hover {
+  text-decoration: 2px underline var(--accent);
+}
+
+/* ______________ banner success/error _______________ */
+
+.banner-container {
+  position: fixed;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  min-width: 300px;
+  margin: 2em;
+  border-radius: 10px;
+  box-shadow: 0 0 10px hsla(0, 0%, 0%, 0.3);
+  backdrop-filter: blur(20px);
+}
+
+:root[data-theme="dark"] .banner-container {
+  box-shadow: 0 0 10px hsla(0, 0%, 100%, 0.3);
+}
+
+.banner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 10px;
+  padding: 1em;
+  color: var(--text);
+  font-size: 1.6rem;
+}
+
+.banner.success i {
+  color: hsl(146, 98%, 50%);
+  font-size: 3.6rem;
+}
+
+.banner.error i {
+  color: hsl(358, 98%, 60%);
+  font-size: 3.6rem;
+}
+
+.banner .banner-message {
+  flex: 1;
+  padding: 0 2rem;
+}
+.banner button {
+  /* all: unset; https://css-tricks.com/overriding-default-button-styles/ */
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0 0.5em 0.1em 0.5em;
+  border: none;
+  border-radius: 0;
+  border-top-right-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font-size: 2.4rem;
+  cursor: pointer;
+}
+
+.banner button:focus,
+.banner button:hover {
+  background: hsla(0, 0%, 0%, 0.1);
+}
+
+:root[data-theme="dark"] .banner button:focus,
+:root[data-theme="dark"] .banner button:hover {
+  background: hsla(0, 0%, 100%, 0.1);
+}

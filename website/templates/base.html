@@ -2,88 +2,212 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=3" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
       rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-      crossorigin="anonymous"
     />
 
-    <title>{% block title %}Home{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital@0;1&family=Tomorrow:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename ='css/style.css') }}"
+    />
+
+    <title>{% block title %}{% endblock %} | ByteMemo</title>
     {% block insert_head_here %}{% endblock %}
   </head>
 
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbar"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbar">
-        <div class="navbar-nav">
-          <a class="nav-item nav-link" id="home" href="/">Home</a>
-          {% if user.is_authenticated %}
-          <a class="nav-item nav-link" id="users" href="/users">Users</a>
-          <a class="nav-item nav-link" id="notes" href="/notes">Notes</a>
-          <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
-          {% else %}
-          <a class="nav-item nav-link" id="login" href="/login">Login</a>
-          <a class="nav-item nav-link" id="signup" href="/signup">Signup</a>
-          {% endif %}
+    {% if user.is_authenticated %}
+    <div class="sidebar sidebar-with-tags" id="sidebar">
+      <!-- id is targeted in the menu button -->
+      <nav class="nav-top">
+        <a href="/" id="logo"
+          ><img
+            src="{{ url_for('static', filename = '/img/bytememo.png')}}"
+            type="button"
+            title="homepage"
+            alt="ByteMemo logo"
+          />ByteMemo</a
+        >
+        <!-- <a href="https://www.flaticon.com/free-icons/brain" title="brain icons">Brain icons created by Good Ware - Flaticon</a> -->
+        <div class="toolbar-tag">
+          <span>Tags</span>
+          <button
+            type="button"
+            title="remove filters"
+            onclick="removeFilters(event)"
+          >
+            <i class="bx bx-eraser bx-md"></i>
+          </button>
+          <a href="/edit-tags" title="edit tags" type="button">
+            <i class="bx bx-edit-alt bx-md"></i>
+          </a>
         </div>
-      </div>
-    </nav>
+      </nav>
+      <form
+        action="{{ url_for('views.home') }}?filter=yes&"
+        method="GET"
+        class="sidebar-form"
+        id="sidebar-form"
+      >
+        <input type="checkbox" name="filter" value="true" checked hidden />
 
-    {% with messages = get_flashed_messages(with_categories=true) %} {% if
-    messages %} {% for category, message in messages %} {% if category ==
-    "error" %}
-    <div class="alert alert-danger alert-dismissable fade show" role="alert">
-      {{ message }}
-      <button type="button" class="close" data-dismiss="alert">
-        <span aria-hidden="true">&times;></span>
-      </button>
+        <!-- global_tags is from the context processor in views.py  -->
+        {% for tag in global_tags %} {% if tag.user_id is sameas user.id %} {%
+        if tag.level is sameas 1 %}
+        <div class="sidebar-tags">
+          <div class="tag-checkbox level-1">
+            <input name="filtered-tags" value="{{tag.id}}"
+            id="checkbox-{{tag.id}}" type="checkbox" {{ 'checked' if tag.id in
+            session['filtered_tags_id'] }} />
+            <!-- filtered_tags is from flask sessions  -->
+            <label for="checkbox-{{tag.id}}">{{tag.name}}</label>
+          </div>
+          {% set parent = tag.id %} {% for tag in global_tags %} {% if
+          tag.user_id is sameas user.id %} {% if tag.parent_tag is sameas parent
+          %}
+          <div class="tag-checkbox level-2">
+            <input name="filtered-tags" value="{{tag.id}}"
+            id="checkbox-{{tag.id}}" type="checkbox" {{ 'checked' if tag.id in
+            session['filtered_tags_id'] }} />
+            <!-- filtered_tags is from flask sessions  -->
+            <label for="checkbox-{{tag.id}}">{{tag.name}}</label>
+          </div>
+          {% endif %} {% endif %} {% endfor %}
+        </div>
+        {% endif %} {% endif %} {% endfor %}
+      </form>
+
+      <button form="sidebar-form" type="submit">Select Tags</button>
+
+      <nav class="nav-bottom">
+        <button class="grid-1" type="button" id="js-popover-button">
+          <i class="bx bx-cog bx-md bx-spin-hover"></i>Manage Account
+        </button>
+        <a class="grid-2" href="/logout">
+          <i class="bx bx-log-out-circle bx-md"></i>Log Out</a
+        >
+
+        <label>
+          <input type="checkbox" id="js-darkmode" />
+          <i class="bx bxs-moon"></i>
+          <i class="bx bxs-sun"></i>
+          <span class="bg-toggle"></span>
+        </label>
+      </nav>
     </div>
+
     {% else %}
-    <div class="alert alert-success alert-dismissable fade show" role="alert">
-      {{ message }}
-      <button type="button" class="close" data-dismiss="alert">
-        <span aria-hidden="true">&times;</span>
-      </button>
+    <!-- this links to if user.is_authenticated -->
+    <div class="sidebar" id="sidebar">
+      <nav class="nav-top">
+        <a href="/" id="logo"
+          ><img
+            src="{{ url_for('static', filename = '/img/bytememo.png')}}"
+            type="button"
+            alt="logo"
+          />ByteMemo</a
+        >
+        <span class="empty-space"></span>
+      </nav>
+      <nav class="nav-bottom">
+        <a class="grid-1" href="/signup"
+          ><i class="bx bx-user-circle bx-md"></i>Signup</a
+        >
+        <a class="grid-2" href="/login"
+          ><i class="bx bx-log-in-circle bx-md"></i>Login</a
+        >
+        <label for="js-darkmode">
+          <input type="checkbox" id="js-darkmode" />
+          <i class="bx bxs-moon"></i>
+          <i class="bx bxs-sun"></i>
+          <span class="bg-toggle"></span>
+        </label>
+      </nav>
     </div>
-    {% endif %} {% endfor %} {% endif %} {% endwith %}
+    {% endif %}
+    <!-- this links to if user.is_authenticated  -->
 
-    <div class="container">{% block content %} {% endblock %}</div>
+    <!-- menu button  -->
+    <div class="menu-button-group">
+      <a class="menu-button" href="#sidebar">
+        <span>
+          <i class="bx bx-chevrons-left bx-rotate-180" aria-hidden="true"></i>
+          <i class="bx bx-chevrons-left" aria-hidden="true"></i>
+        </span>
+      </a>
+      <a class="menu-button close" href="#close-sidebar"></a>
+    </div>
 
-    <script
-      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-      crossorigin="anonymous"
-    ></script>
+    <!-- popover for manage account -->
+    <div class="sidebar-popover" id="js-sidebar-popover" popover>
+      <nav>
+        <ul>
+          <li>
+            <a href="/account-settings">Account Settings</a>
+          </li>
+          <li>
+            <a href="/update-profile">Update Profile</a>
+          </li>
+          <li>
+            <a href="/change-password">Change Password</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- same thing as popover but using dialog for browsers which don't support popover -->
+    <dialog class="sidebar-popover" id="js-sidebar-dialog">
+      <nav>
+        <ul>
+          <li>
+            <a href="/account-settings">Account Settings</a>
+          </li>
+          <li>
+            <a href="/update-profile">Update Profile</a>
+          </li>
+          <li>
+            <a href="/change-password">Change Password</a>
+          </li>
+        </ul>
+      </nav>
+    </dialog>
+
+    <!-- display success/error flash messages  -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div class="banner-container" id="banner">
+      <!-- the if else statements in div and i are 2 different ways to do the same thing in Jinja. The first one is the standard if. The second one is the inline if.  -->
+      <div
+        class="banner {% if category == 'error' %} error {% else %} success {% endif %}"
+      >
+        <i
+          class="bx {{ 'bxs-error-circle' if category == 'error' else 'bxs-check-circle' }}"
+        ></i>
+        <div class="banner-message">{{ message }}</div>
+        <button type="button" id="close-banner" onclick="deleteBanner(event)">
+          <span>&times;</span>
+        </button>
+      </div>
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    {% block content %} {% endblock %}
 
     <script
       type="text/javascript"
-      src="{{ url_for('static', filename='index.js')}}"
+      src="{{ url_for('static', filename='js/index.js')}}"
     ></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/kute.js/2.0.0/kute.min.js"></script>
+
+    {% block insert_script_here %}{% endblock %}
   </body>
 </html>

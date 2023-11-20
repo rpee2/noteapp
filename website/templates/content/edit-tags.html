@@ -1,0 +1,442 @@
+{% extends "base.html" %} {% block title %}Edit Tags{% endblock %} {% block
+insert_head_here %}
+<style>
+  .workspace form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+  }
+
+  .tag-group input[type="checkbox"] {
+    display: none;
+  }
+
+  .tag-group {
+    min-width: 370px;
+    font-family: Tomorrow;
+    /* overflow: hidden; */
+  }
+
+  /* rthis adds padding to the child (level 1) li and grandchild (level 2) li */
+  .tag-group li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin: 0.25em 0;
+    padding-left: 2em;
+    list-style: none;
+    font-size: 1.6rem;
+  }
+
+  /* remove the padding of the child li */
+  .tag-group > li {
+    padding-left: 0;
+  }
+
+  /* collapse all the grandchild (level 2) */
+  .tag-group ul {
+    max-height: 0;
+    overflow-y: hidden;
+    transition: 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+  }
+
+  /* when checked (by clicking anywhere on the label), the grandchild are now expanded  */
+  .tag-group input[type="checkbox"]:checked ~ ul {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  /* animation for collapsing and expanding the grandchild  */
+  .tag-group label .bx-chevron-right {
+    transition: 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+  }
+
+  .tag-group input[type="checkbox"]:checked ~ label .bx-chevron-right {
+    transform: rotate(90deg);
+  }
+
+  .tag-group-button,
+  .tag-group label {
+    display: flex;
+    align-items: center;
+    padding: 0.8em 1em 0.8em 1em;
+    border-radius: 5em;
+    background-color: hsla(
+      var(--primary-h),
+      var(--primary-s),
+      var(--primary-l),
+      0.3
+    );
+    font-size: 1.6rem;
+    cursor: pointer;
+  }
+
+  :root[data-theme="dark"] .tag-group label {
+    background-color: hsla(
+      var(--primary-h),
+      var(--primary-s),
+      var(--primary-l),
+      0.7
+    );
+  }
+
+  .tag-group i,
+  .tag-group button {
+    color: var(--text);
+  }
+
+  /* remove the default button styling  */
+  .tag-group button {
+    /* all: unset; https://css-tricks.com/overriding-default-button-styles/ */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    outline: inherit;
+  }
+
+  .tag-group input[type="text"] {
+    flex: 1;
+    color: var(--text);
+    background: var(--background);
+    border: none;
+    outline: none;
+    border-radius: 0.3em;
+    padding: 0.5em;
+    margin-left: 1em;
+    transition: 0.2s ease;
+  }
+
+  .tag-group .remove-button {
+    margin-left: 1em;
+  }
+
+  /* new parent buttons  */
+  .tag-group-button {
+    justify-content: center;
+    /* border: 2px solid var(--primary); */
+    background-color: var(--secondary);
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .tag-group-button:focus,
+  .tag-group-button:hover {
+    opacity: 0.85;
+  }
+
+  .update-button {
+    margin: 1.5em;
+    padding: 0.8em 1em 0.8em 1em;
+    border: none;
+    border-radius: 5em;
+    background-color: var(--primary);
+    color: white;
+    font-size: 1.6rem;
+    cursor: pointer;
+  }
+
+  .update-button:focus,
+  .update-button:hover {
+    opacity: 0.9;
+  }
+
+  /* for changing the order of the tags  */
+  .move-up {
+    animation: moveUp 300ms ease-out;
+  }
+
+  .move-down {
+    animation: moveDown 300ms ease-out;
+  }
+
+  @keyframes moveUp {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-100%);
+    }
+  }
+
+  @keyframes moveDown {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(100%);
+    }
+  }
+</style>
+
+{% endblock %} {% block content %}
+
+<div class="workspace">
+  <form method="POST">    
+    <!-- template for cloning  -->
+    <ul class="tag-group template" hidden>
+      <li>
+        <!-- this might not be very good HTML because the checkbox is for the UI (dropdown for the tag group), it's not used in the form. But the issue is, if you were to change the checkbox to a button, there is already a button inside and you can't put buttons inside buttons. -->
+        <input type="checkbox" id="" />
+        <label for="">
+          <i class="bx bx-md bx-chevron-right"></i>
+          <input type="text" name="" value="" />
+          <button
+            class="remove-button"
+            type="button"
+            onclick="deleteTagGroup(this)"
+          >
+            <i class="bx bx-sm bx-trash"></i>
+          </button>
+        </label>
+        <ul class="tag-individuals">
+          <li>
+            <label for="">
+              <!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#accessibility_concerns -->
+              <button type="button" onclick="cloneTag(this, 'none')">
+                <i class="bx bx-md bx-plus"></i>
+              </button>
+              <button type="button" onclick="moveUp(this)">
+                <i class="bx bx-md bxs-up-arrow-alt"></i>
+              </button>
+              <button type="button" onclick="moveDown(this)">
+                <i class="bx bx-md bxs-down-arrow-alt"></i>
+              </button>
+              <input type="text" id="" name="" data-parent="" value="" />
+              <button
+                class="remove-button"
+                type="button"
+                onclick="deleteTag(this)"
+              >
+                <i class="bx bx-sm bx-trash"></i>
+              </button>
+            </label>
+          </li>
+        </ul>
+      </li>
+    </ul>
+
+    <!-- actual data  -->
+    {% for tag in tags %} {% if tag.user_id is sameas user.id %} {% if tag.level
+    is sameas 1 %}
+    <ul class="tag-group">
+      <li>
+        <input type="checkbox" id="dropdown-{{tag.id}}" />
+        <label for="dropdown-{{tag.id}}">
+          <i class="bx bx-md bx-chevron-right"></i>
+          <input
+            type="text"
+            name="parent-{{tag.id}}"
+            value="{{tag.name}}"
+          />
+          <button
+            class="remove-button"
+            type="button"
+            onclick="deleteTagGroup(this)"
+          >
+            <i class="bx bx-sm bx-trash"></i>
+          </button>
+        </label>
+        <ul class="tag-individuals">
+          {% set parent = tag.id %} {% for tag in tags %} {% if tag.user_id is
+          sameas user.id %} {% if tag.parent_tag is sameas parent %}
+          <li>
+            <label for="label-{{tag.id}}">
+              <button type="button" onclick="cloneTag(this, {{parent}})">
+                <i class="bx bx-md bx-plus"></i>
+              </button>
+              <button type="button" onclick="moveUp(this)">
+                <i class="bx bx-md bxs-up-arrow-alt"></i>
+              </button>
+              <button type="button" onclick="moveDown(this)">
+                <i class="bx bx-md bxs-down-arrow-alt"></i>
+              </button>
+              <input
+                type="text"
+                id="label-{{tag.id}}"
+                name="child-{{tag.id}}-{{parent}}"
+                value="{{tag.name}}"
+              />
+              <button
+                class="remove-button"
+                type="button"
+                onclick="deleteTag(this)"
+              >
+                <i class="bx bx-sm bx-trash"></i>
+              </button>
+            </label>
+          </li>
+          {% endif %} {% endif%} {% endfor %}
+        </ul>
+      </li>
+    </ul>
+    {% endif %} {% endif %} {% endfor %}
+
+    <!-- this isn't really a tag group, it's a button to create a tag group. But I want similar styling so it's convenient for me to put tag group.  -->
+    <ul class="tag-group">
+      <li>
+        <a
+          href="#"
+          class="tag-group-button"
+          type="button"
+          onclick="createTagGroup(event, this)"
+          ><i class="bx bx-md bx-plus bx-burst-hover"></i
+        ></a>
+      </li>
+    </ul>
+
+    <input
+      type="text"
+      name="tags-to-delete"
+      id="js-tags-to-delete"
+      value=""
+      hidden
+    />
+    <button type="submit" class="update-button">Update</button>
+  </form>
+</div>
+
+{% endblock %} {% block insert_script_here %}
+<script>
+  // counter to keep track of how many new elements there are
+  var x = 1;
+  var y = 2 ** 15;
+
+  // the element should be a button element with a plus icon
+  function cloneTag(element, parentID) {
+    var tagContainer = element.closest("ul"); // this should refer to <ul class="tag-individuals">
+    var existingElement = element.closest("li");
+    var newElement = tagContainer.querySelector("li").cloneNode(true);
+
+    newElement.querySelector("label").setAttribute("for", `new-label-${x}`);
+    newElement.querySelector("input").setAttribute("id", `new-label-${x}`);
+    newElement.querySelector("input").value = `x${x}`; // for testing remove when done
+
+    // this is for newly created tags which have no parent tag ID in the database, we have to attach a data-parent attribute in HTML and retrieve it here
+    if (parentID === "none") {
+      parent = existingElement.querySelector("input").getAttribute("parent");
+    } else {
+      parent = parentID;
+    }
+    newElement
+      .querySelector("input")
+      .setAttribute("name", `new-child-${x}-${parent}`); // this part here is for Flask to recognize whether it is a new child of a old or new parent. There won't be any conflict between the old parent ID in the database and for newly created parents, because the newly created parents are 2^15 and higher.
+    x += 1;
+
+    // insert new element before the existing / element where the button was clicked
+    tagContainer.insertBefore(newElement, existingElement.nextSibling);
+    newElement.querySelector("li label input").focus(); //put cursor inside the input
+  }
+
+  // the element should be a button element with the trash icon - this function creates a problem. If I delete all the child tags, there is no way to add any to the parent. Maybe I can change the function a bit to make it such that, if it is the last li element in the parent, delete it but create a button below the parent tag. similar to what we did in createTagGroup.
+
+  const tagsToDelete = document.getElementById("js-tags-to-delete");
+
+  function deleteTag(element) {
+    const existingElement = element.closest("li");
+    tagsToDelete.value =
+      existingElement.querySelector("input").name + "," + tagsToDelete.value;
+    console.log(tagsToDelete.value);
+    existingElement.remove();
+  }
+
+  function deleteTagGroup(element) {
+    // var tagsToDelete = document.getElementById("js-tags-to-delete");
+    const existingElement = element.closest("ul"); // this is a little tricky because there is a parent ul and child ul, which one does closest refer to? I want it to refer to the parent ul, and in this case it does. But what if it didn't?
+    tagsToDelete.value =
+      existingElement.querySelector(".tag-group > li > label input").name +
+      "," +
+      tagsToDelete.value;
+    console.log(tagsToDelete.value);
+
+    existingElement.remove();
+  }
+
+  // create the group with the dropdown - the element should be the huge button element
+  function createTagGroup(event, element) {
+    // https://stackoverflow.com/questions/1601933/how-do-i-stop-a-web-page-from-scrolling-to-the-top-when-a-link-is-clicked-that-t
+    event.preventDefault(); // prevent jumping to the top of page everytime the link is clicked
+
+    var form = element.closest("form");
+    var newElement = form.querySelector("ul").cloneNode(true); // this should refer to <ul class="tag-group template" hidden>, which I placed at the top of the form
+    newElement.removeAttribute("hidden"); // we unhide it
+
+    // setting attribute for the new parent tag - direct descendants because we don't want to change the child elements (and there are many)
+    // the label of the new parent tag is written to focus on the dropdown while the label of the new child tag (below) is written to focus inside the input.
+    newElement
+      .querySelector(".tag-group > li > label")
+      .setAttribute("for", `dropdown-${y}`);
+    newElement
+      .querySelector(".tag-group > li > input")
+      .setAttribute("id", `dropdown-${y}`);
+
+    newElement
+      .querySelector(".tag-group > li > label input")
+      .setAttribute("name", `new-parent-${y}`);
+    newElement.querySelector(".tag-group > li > label input").value = `y${y}`; // for testing remove when done
+
+    // setting attribute for the new child tag under the parent tag - why can't we just create a parent tag without the child? Because the parent tag does not have any add button and cannot create any child tags. Only child tags can create child tags. We could have an add button on the parent tag, but I think it would be confusing. For example, if I click on it, does it create another parent tag or do I create child tags? To avoid this confusion, this is the solution we arrived at.
+    newElement
+      .querySelector(".tag-individuals label")
+      .setAttribute("for", `new-label-${x}`);
+    newElement
+      .querySelector(".tag-individuals input")
+      .setAttribute("id", `new-label-${x}`);
+    newElement
+      .querySelector(".tag-individuals input")
+      .setAttribute("name", `new-child-${x}-${y}`); // this part here is for Flask to recognize that it is a new child of new parent y
+    newElement
+      .querySelector(".tag-individuals input")
+      .setAttribute("parent", `${y}`);
+    newElement.querySelector(".tag-individuals input").value = `x${x}`; // for testing remove when done
+
+    x += 1;
+    y += 1;
+
+    var existingElement = element.closest("ul");
+    form.insertBefore(newElement, existingElement);
+
+    newElement.querySelector(".tag-group > li > label input").focus(); //put cursor inside the parent input
+  }
+
+  function moveUp(button) {
+    var tagContainer = button.closest("ul");
+    var tagToMove = button.closest("li");
+
+    if (tagToMove.previousElementSibling) {
+      tagToMove.classList.add("move-up");
+      tagToMove.previousElementSibling.classList.add("move-down");
+
+      setTimeout(function () {
+        tagToMove.classList.remove("move-up");
+        tagToMove.previousElementSibling.classList.remove("move-down");
+      }, 280); // cut it off just before the animation ends to prevent the tags from going back to the top when the animation ends
+
+      setTimeout(function () {
+        tagContainer.insertBefore(tagToMove, tagToMove.previousElementSibling);
+      }, 280);
+    }
+  }
+
+  function moveDown(button) {
+    var tagContainer = button.closest("ul");
+    var tagToMove = button.closest("li");
+
+    if (tagToMove.nextElementSibling) {
+      tagToMove.classList.add("move-down");
+      tagToMove.nextElementSibling.classList.add("move-up");
+
+      setTimeout(function () {
+        tagToMove.classList.remove("move-down");
+        tagToMove.nextElementSibling.classList.remove("move-up");
+      }, 280);
+
+      setTimeout(function () {
+        tagContainer.insertBefore(tagToMove.nextElementSibling, tagToMove);
+      }, 280);
+    }
+  }
+</script>
+
+{% endblock %}

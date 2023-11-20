@@ -1,0 +1,135 @@
+{% extends "base.html" %} {% block title %}Account Settings{% endblock %} {%
+block insert_head_here %}
+<style>
+  stop {
+    transition: stop-color 3s;
+  }
+</style>
+{% endblock %} {% block content %}
+
+<div class="container">
+  <div class="wrapper">
+    <form method="POST">
+      {{ form.hidden_tag() }}
+      <!-- CSRF token -->
+      <h1>Account Settings</h1>
+      <div class="hidden-checkbox">
+        <!-- order is important, also i don't understand it (if the input is placed below, the CSS simply won't work) -->
+        {{ form.hasBeta(id="js-cb-power") }} <!-- same as writing <input id="cb-power" type="checkbox" /> -->
+        <label for="cb-power"> Enable Quantum Precognition </label>
+        <p hidden>Enable Quantum Precognition to access your thoughts from up to 16,777,216
+          seconds later (CyberByte is NOT liable to any damages or claims on matters
+          of cyberpsychosis)</p>
+        <div class="pseudo-checkbox"><i class="bx bx-power-off"></i></div>
+      </div>
+      <div class="input-box">
+        {{ form.password(placeholder="Password") }}
+        <i class="bx bxs-lock-alt"></i>
+      </div>
+      {{ form.submit(class="button") }} 
+      {{ form.delete_account(class="button button-delete") }}
+    </form>
+  </div>
+
+  <div class="blob-container">
+    <svg
+      viewBox="0 0 500 500"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      align="center"
+      height="720px"
+      width="750px"
+    >
+      <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop
+            id="stop1"
+            offset="0%"
+            style="stop-color: hsl(240, 10%, 92%)"
+          ></stop>
+          <stop
+            id="stop2"
+            offset="100%"
+            style="stop-color: hsl(240, 3%, 85%)"
+          ></stop>
+        </linearGradient>
+      </defs>
+      <g transform="rotate(5)">
+        <path
+          id="blob1"
+          d="M410.5,330Q441,410,359,405.5Q277,401,217.5,405.5Q158,410,141.5,353Q125,296,72.5,231Q20,166,93,135Q166,104,225.5,78Q285,52,322.5,104.5Q360,157,370,203.5Q380,250,410.5,330Z"
+          fill="url(#gradient)"
+        />
+        <path
+          id="blob2"
+          style="visibility: hidden"
+          d="M366,293Q352,336,315.5,374.5Q279,413,224.5,401Q170,389,132,348Q94,307,87.5,248Q81,189,104,113Q127,37,210,22.5Q293,8,332,78Q371,148,375.5,199Q380,250,366,293Z"
+          fill="url(#gradient)"
+        />
+      </g>
+    </svg>
+  </div>
+</div>
+
+{% endblock %} {% block insert_script_here %}
+<script>
+  var tween = KUTE.fromTo(
+    "#blob1",
+    { path: "#blob1" },
+    { path: "#blob2" },
+    { repeat: 999, duration: 10000, yoyo: true }
+  ).start();
+
+  const powerOnOff = document.getElementById("js-cb-power");
+  const stop1 = document.getElementById("stop1");
+  const stop2 = document.getElementById("stop2");
+  
+  // when document is loaded
+  document.addEventListener("DOMContentLoaded", function () {
+    theme = localStorage.getItem("theme");
+    
+    if (powerOnOff.checked) {
+      if (theme === "light") {
+        stop1.style.stopColor = "rgb(59, 227, 59)";
+        stop2.style.stopColor = "rgb(100, 255, 100)";
+      } else {
+          stop1.style.stopColor = "rgb(0, 0, 0)";
+          stop2.style.stopColor = "rgb(59, 227, 59)";
+      }
+    }
+    else {
+      if (theme === "light") {
+        stop1.style.stopColor = "rgb(233, 233, 237)";
+        stop2.style.stopColor = "rgb(216, 216, 218)";
+      } else {
+          stop1.style.stopColor = "rgb(0, 0, 0)";
+          stop2.style.stopColor = "rgb(233, 233, 237)";
+      }
+    }
+  });
+
+  // when checkbox is clicked
+  powerOnOff.addEventListener("change", function () {
+    theme = localStorage.getItem("theme");
+
+    if (this.checked) {
+      if (theme === "light") {
+        stop1.style.stopColor = "rgb(59, 227, 59)";
+        stop2.style.stopColor = "rgb(100, 255, 100)";
+      } else {
+          stop1.style.stopColor = "rgb(0, 0, 0)";
+          stop2.style.stopColor = "rgb(59, 227, 59)";
+      }
+    } else {
+      if (theme === "light") {
+        stop1.style.stopColor = "rgb(233, 233, 237)";
+        stop2.style.stopColor = "rgb(216, 216, 218)";
+      } else {
+          stop1.style.stopColor = "rgb(0, 0, 0)";
+          stop2.style.stopColor = "rgb(233, 233, 237)";
+      }
+    }
+  });
+</script>
+
+{% endblock %}

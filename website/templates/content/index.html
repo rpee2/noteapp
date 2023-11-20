@@ -1,0 +1,238 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {%block
+insert_head_here %}
+<style>
+  .workspace {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    padding: 2em 8em;
+  }
+
+  .tag-headline {
+    justify-self: center;
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 1em;
+  }
+
+  .tag-headline i {
+    font-size: 3rem;
+    color: var(--primary);
+  }
+  
+  .tag-headline span {
+    margin: 0 0.25em;
+    padding: 0.5em;
+    border: 2px solid var(--primary);
+    border-radius: 2em;
+    color: var(--primary);
+    font-size: 1.6rem;
+  }
+  
+  .cards {
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, 336px);
+    justify-content: space-evenly; 
+    row-gap: 4em;
+    /* cards are 320px long, setting 336px columns gives them 8px margin each side (also can use column-gap) */
+  }
+
+  .new-card,
+  .card {
+    height: 260px;
+    width: 320px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 6px 10px hsla(
+      var(--primary-h),
+      var(--primary-s),
+      var(--primary-l),
+      0.4
+    );  
+    /* box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.25); */
+    text-decoration: none;
+    color: var(--text);
+    cursor: default;
+    transition: all 0.2s;
+  }
+
+  .new-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background);
+    color: var(--text);
+  }
+  
+  
+  .new-card i {
+    font-size: 8rem;
+    transition: all 0.2s;
+  }
+
+  .card {
+    display: grid;
+    grid-template-rows: 2em 3.2em 12em 1fr;
+    background-color: hsl(
+      var(--primary-h), 
+      88%, 
+      88%
+      );
+    }
+    
+    :root[data-theme="dark"] .card {
+      background-color: hsl(
+        var(--primary-h),
+        80%,
+        60%
+      );  
+    }
+
+  .new-card:hover,
+  .card:hover {
+    box-shadow: 0px 6px 15px hsla(
+      var(--primary-h),
+      var(--primary-s),
+      var(--primary-l),
+      0.7
+    );  
+    transform: scale(1.01);
+  }
+
+  .new-card:hover i {
+    color: var(--primary);
+    transform: scale(1.1);
+  }
+
+  .card-top,
+  .card-tag,
+  .card-title,
+  .card-body {
+    color: var(--text);
+  }
+
+  .card-top {
+    grid-row: 1/2;
+    display: flex;
+    justify-content: space-between;
+    color: var(--text);
+    font-size: 1.2rem;
+  }
+  
+  .card-top button {
+    position: relative;
+    border: 0;
+    background: none;
+  }
+
+  /* right 0 means you setting it just to the right of the parent element  */
+  .card-top i {
+    position: absolute;
+    bottom: 4px;
+    right: -8px;
+    z-index: 2;
+    color: var(--text);
+    font-size: 2rem;
+    visibility: visible;
+    cursor: pointer;
+    transition: all 0.1s cubic-bezier(0.95, 0.05, 0.795, 0.035);
+  }
+
+  .card-top i:hover {
+    color: var(--accent);
+    transform: scale(1.4);
+  }
+
+  .card-title {
+    grid-row: 2/3;
+    font-size: 2em;
+    font-weight: 500;
+  }
+
+  .card-body {
+    grid-row: 3/4;
+    margin-bottom: 0.8em;
+    font-size: 1.4rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .card-tag {
+    grid-row: 4/5;
+    /* max-height align-self overflow-y work together */
+    max-height: 100%;
+    align-self: end;
+    /* justify-self: end; - this doesn't work well with flex wrap */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.25em;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    font-size: 1.4rem;
+  }
+    
+  .card-tag i {
+    font-size: 1.6rem;
+    align-self: center;
+  }
+
+  .card-tag span {
+    color: var(--text);
+  }
+
+  /* .card-1 {
+    background: radial-gradient(rgba(90, 70, 188, 0.8),rgb(89, 70, 188, 0.9));
+    background-image: radial-gradient(circle, #5a46bc, #6351bb, #6c5cb9, #7467b7, #7c71b5);
+  } */
+</style>
+{% endblock %} {% block content %}
+{% if user is defined and user.name|length %}
+<div class="workspace">
+
+  <div class="tag-headline">
+  {% if session['filtered_tags_name'] is defined and session['filtered_tags_name']|length %}
+    <i class="bx bx-purchase-tag"></i>
+  {% for tag in session['filtered_tags_name'] %}
+    <span>{{tag}}</span>
+  {% endfor %}
+  {% endif %}
+
+  </div>
+
+  <div class="cards">
+    <a class="new-card" href="{{ url_for('views.note') }}">
+      <i class="bx bx-plus"></i>
+    </a>
+    {% for note in filtered_notes %}
+    <a class="card card-1" href="{{ url_for('views.note',note_id=note.id) }}">
+      <div class="card-top">
+        {% if note.time_ago[0] == 'day' %}
+        <p>{{ note.time_ago[1] }} days ago - {{ note.date_created_strf }}</p>
+        {% elif note.time_ago[0] == 'hour' %}
+        <p>{{ note.time_ago[1] }} hours ago - {{ note.date_created_strf }}</p>
+        {% else %}
+        <p>{{ note.time_ago[1] }} mins ago - {{ note.date_created_strf }}</p>
+        {% endif %}
+
+        <button
+          type="button"
+          onClick="deleteNote(event, {{note.id}})"
+          id="deletebutton"
+        > 
+          <i class="bx bx-x"></i>
+        </button> 
+      </div>
+
+      <h2 class="card-title">{{ note.title | truncate(20, True) }}</h2>
+      <p class="card-body">{{ note.body | truncate(512, True) }}</p>
+      <div class="card-tag">
+        <i class="bx bxs-purchase-tag"></i>{% for tag in note.tags %}{{ tag.name}}
+        <span> {{ "|" if not loop.last else "" }}</span>{% endfor %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- {%endif %} -->
+<!-- i think this belongs to the if user...but it seems to work even without this  -->
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %} {% block title %}Signup{% endblock %} {% block content
+%}
+
+<div class="container">
+  <div class="wrapper">
+    <form method="POST">
+      {{ form.hidden_tag() }}
+      <h1>Login</h1>
+      <div class="input-box">
+        <input type="email" name="email" placeholder="Email"/>
+        <i class="bx bxs-envelope"></i>
+      </div>
+      <div class="input-box">
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+        />
+        <i class="bx bxs-lock-alt"></i>
+      </div>
+      <!-- <div class="forget-link">
+        <a href="#">Forget password?</a>
+      </div> -->
+      <button type="submit" class="button">Login</button>
+      <div class="signup-link">
+        <p>
+          Don't have an account?
+          <a href="{{ url_for('auth.signup') }}">Register</a>
+        </p>
+      </div>
+    </form>
+  </div>
+  <div class="blob-container">
+    <svg
+      viewBox="0 0 500 500"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      height="650px"
+      width="650px"
+      id="blobSvg"
+    >
+      <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color: hsla(247, 54%, 70%, 0.5)"></stop>
+          <stop
+            offset="100%"
+            style="stop-color: hsla(271, 100%, 50%, 0.7)"
+          ></stop>
+        </linearGradient>
+      </defs>
+      <path
+        id="blob1"
+        d="M439,314.5Q450,379,379.5,379.5Q309,380,262.5,433.5Q216,487,180.5,429Q145,371,108.5,336.5Q72,302,78.5,251.5Q85,201,92.5,139Q100,77,160.5,64.5Q221,52,276,62.5Q331,73,356,119.5Q381,166,404.5,208Q428,250,439,314.5Z"
+        fill="url(#gradient)"
+      ></path>
+      <path
+        id="blob2"
+        style="visibility: hidden"
+        d="M393.5,297.5Q397,345,371.5,402.5Q346,460,286,439Q226,418,171.5,410.5Q117,403,77,358Q37,313,71.5,260.5Q106,208,109,149Q112,90,170.5,96Q229,102,288.5,68Q348,34,376.5,92Q405,150,397.5,200Q390,250,393.5,297.5Z"
+        fill="url(#gradient)"
+      ></path>
+    </svg>
+  </div>
+</div>
+{% endblock %} {% block insert_script_here %}
+<script>
+  var tween = KUTE.fromTo(
+    "#blob1",
+    { path: "#blob1" },
+    { path: "#blob2" },
+    { repeat: 999, duration: 10000, yoyo: true },
+  ).start();
+</script>
+{% endblock %}

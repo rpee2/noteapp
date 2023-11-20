@@ -1,0 +1,63 @@
+{% extends "base.html" %} {% block title %}Update Profile{% endblock %} {% block
+content %}
+<div class="container">
+  <div class="wrapper">
+    <form method="POST">
+      {{ form.hidden_tag() }}
+      <!-- CSRF token -->
+      <h1>Update Profile</h1>
+      <div class="input-box">
+        {{ form.name(placeholder="Name") }}
+        <i class="bx bxs-user"></i>
+      </div>
+      <div class="input-box">
+        {{ form.email(placeholder="Email") }}
+        <i class="bx bxs-envelope"></i>
+      </div>
+      {{ form.update(class="button") }}
+    </form>
+  </div>
+
+  <div class="blob-container">
+    <svg
+      viewBox="0 0 500 500"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      height="650px"
+      width="650px"
+    >
+      <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color: hsla(247, 54%, 70%, 0.5)"></stop>
+          <stop
+            offset="100%"
+            style="stop-color: hsl(322, 100%, 50%, 0.5)"
+          ></stop>
+        </linearGradient>
+      </defs>
+      <path
+        id="blob1"
+        d="M425.5,316Q407,382,343.5,400.5Q280,419,212.5,425.5Q145,432,85.5,382Q26,332,46,257.5Q66,183,105.5,125.5Q145,68,216.5,50.5Q288,33,335.5,85.5Q383,138,413.5,194Q444,250,425.5,316Z"
+        fill="url(#gradient)"
+      />
+      <path
+        id="blob2"
+        style="visibility: hidden"
+        d="M403.5,290.5Q347,331,314,379Q281,427,214.5,427Q148,427,118,368Q88,309,93,252Q98,195,118.5,126.5Q139,58,215,39Q291,20,362.5,57.5Q434,95,447,172.5Q460,250,403.5,290.5Z"
+        fill="url(#gradient)"
+      />
+    </svg>
+  </div>
+</div>
+{% endblock %} {% block insert_script_here %}
+<script>
+  var tween = KUTE.fromTo(
+    "#blob1",
+    { path: "#blob1" },
+    { path: "#blob2" },
+    { repeat: 999, duration: 10000, yoyo: true }
+  ).start();
+
+</script>
+
+{% endblock %}
