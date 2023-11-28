@@ -161,38 +161,41 @@ insert_head_here %}
     padding: 0.5em 1em;
     border: none;
     border-radius: 2em;
-    box-shadow: 0 0 10px hsla(0, 0%, 0%, 0.2);
     font: bold 1.8rem Tomorrow;
     background: var(--accent);
     color: hsl(0, 0%, 90%);
     text-decoration: none;
     cursor: pointer;
   }
-
-  :root[data-theme="dark"]  .bento-secondary .cta {
-    box-shadow: 0 0 10px hsla(0, 0%, 100%, 0.2);
-  }
   
   .bento-secondary .cta:focus,
   .bento-secondary .cta:hover {
     transform: scale(1.01);
+    box-shadow: 0 0 10px hsla(0, 0%, 0%, 0.2);
   }
 
-  .bento-sauce {
+  :root[data-theme="dark"] .bento-secondary .cta:focus,
+  :root[data-theme="dark"] .bento-secondary .cta:hover {
+    box-shadow: 0 0 10px hsla(0, 0%, 100%, 0.2);
+  }
+
+  .bento-tertiary {
     grid-area: box2;
     height: 100%;
     width: 100%;
+    display: flex;
+    align-items: center;
     padding: 1em;
     font: 2rem Poppins;
     color: var(--text);
     background-color: hsla(322, 100%, 50%, 0.2);
   }
   
-  :root[data-theme="dark"] .bento-sauce {
+  :root[data-theme="dark"] .bento-tertiary {
     background-color: hsla(322, 100%, 50%, 0.8);
   }  
 
-  .bento-sauce i {
+  .bento-tertiary i {
     color: var(--text);
     font-size: 3rem;
     float: left;
@@ -246,11 +249,13 @@ insert_head_here %}
         <img src="{{url_for('static', filename='img/arrow.png')}}" alt="" />
       </a>
     </div>
-    <div class="bento-sauce">
-      <i class="bx bxs-layer"></i>
+    <div class="bento-tertiary">
+      <div>
+        <i class="bx bxs-layer"></i>
         <p>
-          &nbsp; Two layers of tags allow for easy note access.
+          &nbsp; Two layers of tags allow for easy access to all your ideas.
         </p>
+      </div>
     </div>
   </div>
 </div>

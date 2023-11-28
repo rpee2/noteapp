@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico' )}}"> 
+    
     <link
       href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
       rel="stylesheet"
@@ -29,14 +30,21 @@
       <!-- id is targeted in the menu button -->
       <nav class="nav-top">
         <a href="/" id="logo"
-          ><img
-            src="{{ url_for('static', filename = '/img/bytememo.png')}}"
+          ><img 
+            class="logo-light"
+            src="{{ url_for('static', filename = '/img/logo.png')}}"
+            type="button"
+            title="homepage"
+            alt="ByteMemo logo"
+          />
+          <img 
+            class="logo-dark"
+            src="{{ url_for('static', filename = '/img/logo-dark.png')}}"
             type="button"
             title="homepage"
             alt="ByteMemo logo"
           />ByteMemo</a
         >
-        <!-- <a href="https://www.flaticon.com/free-icons/brain" title="brain icons">Brain icons created by Good Ware - Flaticon</a> -->
         <div class="toolbar-tag">
           <span>Tags</span>
           <button
@@ -109,10 +117,19 @@
     <div class="sidebar" id="sidebar">
       <nav class="nav-top">
         <a href="/" id="logo"
-          ><img
-            src="{{ url_for('static', filename = '/img/bytememo.png')}}"
+          ><img 
+            class="logo-light"
+            src="{{ url_for('static', filename = '/img/logo.png')}}"
             type="button"
-            alt="logo"
+            title="homepage"
+            alt="ByteMemo logo"
+          />
+          <img 
+            class="logo-dark"
+            src="{{ url_for('static', filename = '/img/logo-dark.png')}}"
+            type="button"
+            title="homepage"
+            alt="ByteMemo logo"
           />ByteMemo</a
         >
         <span class="empty-space"></span>

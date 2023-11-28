@@ -82,18 +82,17 @@ def signup():
                 new_user = User()
                 new_user.email = email
                 new_user.name = name
-                new_user.password = generate_password_hash(password1, method="scrypt") # User.password is a str with len 32, which is the length of the sha256 hash
+                new_user.password = generate_password_hash(password1, method="scrypt") 
                 new_user.hasBeta = beta_checkbox
                 db.session.add(new_user)
                 db.session.commit()
 
                 flash("account created", category="success")
-                login_user(new_user, remember=True)
-                return redirect(url_for("views.home"))
+                return redirect(url_for("auth.login"))
         else:
-            flash("input missing", category="error")
+            flash("missing input", category="error")
         
-        return redirect(url_for("auth.change_password")) 
+        return redirect(url_for("auth.signup")) 
 
     return render_template("auth/signup.html", user=current_user, form=form)
 

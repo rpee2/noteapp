@@ -2,9 +2,11 @@ from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField,
     StringField,
+    TextAreaField,
     EmailField,
     PasswordField,
     SubmitField,
+    HiddenField,
     ValidationError,
     FieldList,
     Form,
@@ -14,7 +16,6 @@ from wtforms.validators import DataRequired, EqualTo, Length
 
 
 # some forms don't have validators because I use custom loops to display the flash message. 
-
 
 class LoginForm(FlaskForm):
     email = EmailField()
@@ -57,11 +58,21 @@ class ChangePasswordForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
-# https://www.youtube.com/watch?v=DqumX6deRR8 (using wtform and flask wtform it's like a layer over a layer type shi-)
-class TagFormElement(Form):
-    tag = StringField()
+class NoteForm(FlaskForm):
+    tag_search = StringField("Tags")
+    note_tags = StringField()
+    note_title = StringField("Title")
+    note_body_delta = HiddenField()
+    note_body_html = HiddenField()
+    note_body_text = HiddenField()
+    save = SubmitField("Save")
 
 
-class CustomTagForm(FlaskForm):
-    tags = FieldList(FormField(TagFormElement), min_entries=0, max_entries=225)  # 15x15
-    update = SubmitField("Update")
+# https://www.youtube.com/watch?v=DqumX6deRR8 (learning how to create a dynamic form)
+# class TagFormElement(Form):
+#     tag = StringField()
+
+
+# class CustomTagForm(FlaskForm):
+#     tag = FieldList(FormField(TagFormElement), min_entries=0, max_entries=15)  # 15x15
+#     update = SubmitField("Update")

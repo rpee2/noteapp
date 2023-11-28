@@ -173,7 +173,9 @@ insert_head_here %}
 {% endblock %} {% block content %}
 
 <div class="workspace">
-  <form method="POST">    
+  <form method="POST" id="tag-editor">    
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
     <!-- template for cloning  -->
     <ul class="tag-group template" hidden>
       <li>
@@ -243,7 +245,7 @@ insert_head_here %}
           sameas user.id %} {% if tag.parent_tag is sameas parent %}
           <li>
             <label for="label-{{tag.id}}">
-              <button type="button" onclick="cloneTag(this, {{parent}})">
+              <button type="button" onclick="cloneTag(this, '{{parent}}')">
                 <i class="bx bx-md bx-plus"></i>
               </button>
               <button type="button" onclick="moveUp(this)">
@@ -293,12 +295,26 @@ insert_head_here %}
       value=""
       hidden
     />
+    
     <button type="submit" class="update-button">Update</button>
   </form>
 </div>
 
 {% endblock %} {% block insert_script_here %}
 <script>
+  // if users are deleting tags we want them to know that they will also remove the tag relationships
+  const tag_editor = document.getElementById("tag-editor");
+  tag_editor.addEventListener("submit", function(event){
+    var tags_to_delete = tag_editor.querySelector("input[name='tags-to-delete']");
+    if (tags_to_delete.value) {
+      var string = tags_to_delete.innerHTML.slice(0,-2); // the way I wrote the innerHTML is tag + ", " + tag + ", " + ... which means you have to remove the ", " at the end of the innerHTML which are the last 2 characters
+      if (window.confirm(`deleting the tags ${string} will also remove these tags from the respective notes`) == false) {
+        event.preventDefault()
+      }
+    }
+  });
+
+
   // counter to keep track of how many new elements there are
   var x = 1;
   var y = 2 ** 15;
@@ -333,11 +349,12 @@ insert_head_here %}
 
   const tagsToDelete = document.getElementById("js-tags-to-delete");
 
+  // innerHTML is just the name of the tags in a string, which will be displayed to the user to tell them they are deleting these tags
   function deleteTag(element) {
     const existingElement = element.closest("li");
     tagsToDelete.value =
       existingElement.querySelector("input").name + "," + tagsToDelete.value;
-    console.log(tagsToDelete.value);
+    tagsToDelete.innerHTML = existingElement.querySelector("input").value + ", " + tagsToDelete.innerHTML;
     existingElement.remove();
   }
 
@@ -348,7 +365,7 @@ insert_head_here %}
       existingElement.querySelector(".tag-group > li > label input").name +
       "," +
       tagsToDelete.value;
-    console.log(tagsToDelete.value);
+    tagsToDelete.innerHTML = existingElement.querySelector(".tag-group > li > label input").value + ", " + tagsToDelete.innerHTML;
 
     existingElement.remove();
   }

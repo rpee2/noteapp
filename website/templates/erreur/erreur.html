@@ -1,8 +1,8 @@
 {% extends 'base.html' %} {% block title %} 404 {% endblock %} {% block
 insert_head_here %}
 <style>
-  .bg-404 {
-    background: url("{{url_for('static', filename= '/img/404.gif')}}") no-repeat;
+  .bg-400s {
+    background: url("{{url_for('static', filename= '/img/400s.gif')}}") no-repeat;
   }
   
   .bg-500 {
@@ -67,7 +67,7 @@ insert_head_here %}
 </style>
 
 {% endblock %} {% block content %}
-<div class="background {{'bg-404' if e == '404' else 'bg-500'}}">
+<div class="background {{'bg-500' if e == '500' else 'bg-400s'}}">
   <div class="svg-container">
     <h1 class="title">
       <svg id="mask-title" class="title">
@@ -79,7 +79,7 @@ insert_head_here %}
             y="0em"
             dy="0.125em"
           >
-            {{'404' if e == '404' else '500'}}
+          {{ '400' if e == '400' else '404' if e == '404' else '500' if e == '500' }}
           </text>
         </clipPath>
       </svg>
@@ -94,9 +94,11 @@ insert_head_here %}
           dy="0.125em"
           fill="hsla(0,0%,100%,1)"
         >
-          {% if e == '404' %} "This place ain't on the map, punk. Where to,
-          <a href="{{url_for('views.home')}}">HOME</a>
-          ?" {% else %} "System's glitching. We ain't going nowhere till it's back" {% endif %}
+        {% if e == '400' %} "Route's going off track. Check if the drop zone's correct."
+        {% elif e == '404' %} "This place ain't on the map, punk. Where to,<a href="{{url_for('views.home')}}">HOME</a>?" 
+        {% elif e == '500' %} "System's tripping. Ain't going nowhere till it's back."
+          
+          {% endif %}
         </text>
       </svg>
     </p>

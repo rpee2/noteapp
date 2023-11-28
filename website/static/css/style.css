@@ -45,12 +45,6 @@
   --accent: hsl(322, 100%, 50%);
 }
 
-.test {
-
-  color: #6b5ecf;
-  color: #ff00a2;
-}
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -145,8 +139,24 @@ nav a {
 }
 
 nav a img {
-  height: 2.5em;
-  width: 2.5em;
+  height: 2.4em;
+  width: 2.4em;
+}
+
+.logo-light {
+  display: block;
+}
+
+.logo-dark {
+  display: none;
+}
+
+:root[data-theme="dark"] .logo-light {
+  display: none;
+}
+
+:root[data-theme="dark"] .logo-dark {
+  display: block;
 }
 
 .toolbar-tag {

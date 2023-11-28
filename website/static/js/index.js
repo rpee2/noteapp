@@ -90,14 +90,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // home.html
 
-function deleteNote(event, noteId) {
-  // prevent default behavior of anchor tag (which redirects to note.html page)
-  // we have to explicitly pass in event on the button click, if not it gets weird
-  event.preventDefault();
+function deleteNote(event, note_id) {
+  // stop the onclick event of the parent card div
+  event.stopPropagation();
+  
+  var csrf_token = document.head.querySelector("meta[name='csrf-token']").getAttribute("content");
+
   fetch("/delete-note", {
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrf_token,
+    },
     method: "POST",
-    body: JSON.stringify({ noteId: noteId }),
-  }).then((_res) => {
-    window.location.href = "/"; // return back to home
+    credentials: "same-origin",
+    body: JSON.stringify({ note_id: note_id }),
+  }).then((response) => {
+    if (response.status === 200) {
+      window.location.href = "/";
+    } 
   });
 }

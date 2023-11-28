@@ -8,7 +8,13 @@ flask = "*"
 flask-login = "*"
 flask-sqlalchemy = "*"
 flask-wtf = "*"
-werkzeug = "==2.3.0"
+werkzeug = "*"
+bleach = "*"
+flask-talisman = "*"
+tinycss2 = "*"
+psycopg2 = "*"
+python-dotenv = "*"
+gunicorn = "*"
 
 [dev-packages]
 

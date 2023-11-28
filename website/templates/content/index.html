@@ -1,5 +1,8 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {%block
 insert_head_here %}
+
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
 <style>
   .workspace {
     display: grid;
@@ -42,16 +45,15 @@ insert_head_here %}
     width: 320px;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0px 6px 10px hsla(
+    box-shadow: 0px 4px 8px hsla(
       var(--primary-h),
       var(--primary-s),
       var(--primary-l),
       0.4
     );  
     /* box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.25); */
-    text-decoration: none;
     color: var(--text);
-    cursor: default;
+    cursor: pointer;
     transition: all 0.2s;
   }
 
@@ -59,10 +61,10 @@ insert_head_here %}
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--background);
+    background-color: var(--secondary);
     color: var(--text);
-  }
-  
+    text-decoration: none;
+  }  
   
   .new-card i {
     font-size: 8rem;
@@ -79,23 +81,33 @@ insert_head_here %}
       );
     }
     
-    :root[data-theme="dark"] .card {
-      background-color: hsl(
-        var(--primary-h),
-        80%,
-        60%
-      );  
-    }
+  :root[data-theme="dark"] .card {
+    background-color: hsl(
+      var(--primary-h),
+      80%,
+      60%
+    );  
+  }
 
   .new-card:hover,
   .card:hover {
-    box-shadow: 0px 6px 15px hsla(
+    box-shadow: 0px 4px 16px hsla(
       var(--primary-h),
       var(--primary-s),
       var(--primary-l),
       0.7
     );  
     transform: scale(1.01);
+  }
+
+  :root[data-theme="dark"] .new-card:hover,
+  :root[data-theme="dark"]  .card:hover {
+    box-shadow: 0px 4px 16px hsla(
+      var(--primary-h),
+      var(--primary-s),
+      59%,
+      0.7
+    );  
   }
 
   .new-card:hover i {
@@ -151,9 +163,19 @@ insert_head_here %}
   .card-body {
     grid-row: 3/4;
     margin-bottom: 0.8em;
+    /* border-radius: 0.5em; */
     font-size: 1.4rem;
     overflow-y: auto;
     scrollbar-width: thin;
+    cursor:auto;
+  }
+
+  .card-body:hover {
+    outline: 2px solid hsla(247, 54%, 41%, 0.3);
+  }
+
+  :root[data-theme="dark"] .card-body:hover {
+    outline: 2px solid hsla(247, 54%, 41%, 0.7);
   }
 
   .card-tag {
@@ -183,6 +205,102 @@ insert_head_here %}
     background: radial-gradient(rgba(90, 70, 188, 0.8),rgb(89, 70, 188, 0.9));
     background-image: radial-gradient(circle, #5a46bc, #6351bb, #6c5cb9, #7467b7, #7c71b5);
   } */
+
+  /* _________ displaying the innerHTML of the Quill Editor ___________*/
+  /* Quill uses CSS classes to indent lists, which does not translate well into HTML. Because of this, indents of ordered lists do not display correctly. A lot of users seem to face this problem as well. There are some workarounds but looks like a lot of effort https://codepen.io/timothy-walton/pen/dyoLwwW?editors=0010. Remind myself to check when Quill 2.0 is released to see if there are any fixes. */
+  /* 
+  https://github.com/quilljs/quill/issues/1314
+  https://github.com/quilljs/quill/issues/979
+   */
+  .card-body ol,
+  .card-body ul {
+  margin-left: 1em;
+  list-style-type: none;
+  }
+
+  .card-body ul .ql-indent-1 {
+    list-style-type: square;
+    margin-left: 2.5em;
+  }
+
+  .card-body ul .ql-indent-2 {
+    list-style-type: circle;
+    margin-left: 4em;
+  }
+
+  .card-body ul .ql-indent-3 {
+    list-style-type: disc;
+    margin-left: 5.5em;
+  }
+  
+
+  .card-body ol li:first-child::before {
+    /* content: ''; */
+    counter-reset: indent;
+    content: counter(indent) ". ";
+  }
+  .card-body ol li::before {
+    counter-increment: indent;
+    content: counter(indent) ". ";
+  }
+
+  .card-body ol .ql-indent-1:first-child::before {
+    /* content: ''; */
+    counter-reset: indent;
+    content:counter(indent, lower-alpha) ". ";
+  }
+  .card-body ol .ql-indent-1::before { 
+    counter-increment: indent;
+    content:counter(indent, lower-alpha) ". ";
+    margin-left: 2.5em;
+  }
+
+  .card-body ol .ql-indent-2:first-child::before {
+    /* content: ''; */
+    counter-reset: indent;
+    content:counter(indent, lower-roman) ". ";
+  }
+  .card-body ol .ql-indent-2::before {
+    counter-increment: indent;
+    content:counter(indent, lower-roman) ". ";
+    margin-left: 4em;
+  }
+  
+  .card-body ol .ql-indent-3:first-child::before {
+    /* content: ''; */
+    counter-reset: indent;
+    content:counter(indent, decimal) ". ";
+  }
+  .card-body ol .ql-indent-3::before {
+    counter-increment: indent;
+    content:counter(indent, decimal) ". ";
+    margin-left: 5.5em;
+  }
+
+  .card-body ol::before {
+    content: '';
+    counter-set: indent;
+  }
+
+  .card-body li::before {
+    content: '';
+    counter-increment: indent;
+  }  
+
+  /* https://stackoverflow.com/questions/7291873/disable-color-change-of-anchor-tag-when-visited */
+  .card-body a, 
+    .card-body a:visited, 
+    .card-body a:hover, 
+    .card-body a:active {
+      color: #0066cc;
+  }
+
+  :root[data-theme="dark"] .card-body a, 
+  :root[data-theme="dark"] .card-body a:visited, 
+  :root[data-theme="dark"] .card-body a:hover, 
+  :root[data-theme="dark"] .card-body a:active {
+    color: hsl(320, 93%, 69%);
+  }
 </style>
 {% endblock %} {% block content %}
 {% if user is defined and user.name|length %}
@@ -203,7 +321,7 @@ insert_head_here %}
       <i class="bx bx-plus"></i>
     </a>
     {% for note in filtered_notes %}
-    <a class="card card-1" href="{{ url_for('views.note',note_id=note.id) }}">
+    <div class="card card-1" onclick="location.href='{{ url_for('views.note',note_id=note.id) }}';" title="edit note">
       <div class="card-top">
         {% if note.time_ago[0] == 'day' %}
         <p>{{ note.time_ago[1] }} days ago - {{ note.date_created_strf }}</p>
@@ -215,7 +333,7 @@ insert_head_here %}
 
         <button
           type="button"
-          onClick="deleteNote(event, {{note.id}})"
+          onClick="deleteNote(event, '{{note.id}}')"
           id="deletebutton"
         > 
           <i class="bx bx-x"></i>
@@ -223,12 +341,12 @@ insert_head_here %}
       </div>
 
       <h2 class="card-title">{{ note.title | truncate(20, True) }}</h2>
-      <p class="card-body">{{ note.body | truncate(512, True) }}</p>
+      <div class="card-body" onclick="event.stopPropagation();">{{ note.body_html | safe }}</div>
       <div class="card-tag">
         <i class="bx bxs-purchase-tag"></i>{% for tag in note.tags %}{{ tag.name}}
         <span> {{ "|" if not loop.last else "" }}</span>{% endfor %}
       </div>
-    </a>
+    </div>
     {% endfor %}
   </div>
 </div>

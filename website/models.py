@@ -1,6 +1,7 @@
 from . import db  # from init.py
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+from datetime import datetime, timezone
 from dataclasses import dataclass
 
 # https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/models/
@@ -11,7 +12,7 @@ class User(db.Model, UserMixin):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(64), unique=True)  # nullable=False
-    password = db.Column(db.String(32))  # this is the sha256 hash not the password
+    password = db.Column(db.String(256))  # this is the hash not the password
     name = db.Column(db.String(64))
     hasBeta = db.Column(db.Boolean())
     tags = db.relationship("Tag", backref="user")
@@ -54,11 +55,15 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     title = db.Column(db.String(256), default="")
-    body = db.Column(db.Text, default="")
+    body_delta = db.Column(db.Text, default="")
+    body_html = db.Column(db.Text, default="")
+    body_text = db.Column(db.Text, default="")
     date_created = db.Column(
         db.DateTime(timezone=True), default=func.now()
-    )  # altenative to func.now() is datetime.utcnow
-    date_modified = db.Column(db.DateTime(timezone=True), default=func.now())
+    )  # https://stackoverflow.com/a/25662061
+    date_modified = db.Column(
+        db.DateTime(timezone=True), default=func.now()
+    )
 
     def __repr__(self):
         return f"<Note: {self.title}>"

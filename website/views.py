@@ -10,20 +10,22 @@ from flask import (
     abort,
 )
 from flask_login import login_required, current_user
-from .models import User, Note, Tag
-from .forms import CustomTagForm
 from datetime import datetime, timezone, timedelta
 from sqlalchemy.sql import func
+import bleach
+
 from . import db
-import json
+from .models import Note, Tag
+from .forms import NoteForm
+from .constants import allowed_html_tags, allowed_attributes, styles
 
 
 views = Blueprint("views", __name__)
 
 
 def time_ago(date_modified):
-    now = datetime.utcnow()
-    time_difference = now - date_modified
+    now = datetime.now(timezone.utc) # https://stackoverflow.com/a/25662061
+    time_difference = now - date_modified.replace(tzinfo=timezone.utc) # we have to do this because func.now() does not contain any timezone info
     seconds_ago = (
         time_difference.total_seconds()
     )  # https://stackoverflow.com/questions/51652952/python-timedelta-seconds-vs-total-seconds
@@ -138,7 +140,7 @@ def home():
 @login_required
 def note(note_id=None):
     user_tags = Tag.query.filter_by(user_id=current_user.id).all()
-
+    form = NoteForm()
     if request.method == "GET":
         # retrieve all the info from the note db object and display it on the screen
         if note_id is None:
@@ -154,23 +156,25 @@ def note(note_id=None):
                 current_note.user_id == current_user.id
             ):  # very important (without this users can access other users' notes)
                 note_tags = current_note.tags
-                note_title = current_note.title
-                note_body = current_note.body
+                # form.note_body.data = (
+                #     current_note.body
+                # )  # pre-populate the form in the server first because {{ ckeditor.load() }} is a textarea and I can't insert anything in between <textarea></textarea> since there is no textarea yet before Jinja renders the template. I usually prefer populating in the HTML because it is easier to see and change
                 return render_template(
                     "content/note.html",
                     user=current_user,
-                    note_title=note_title,
-                    note_body=note_body,
+                    current_note=current_note,
                     js_note_tags=note_tags,  # tags belonging to the note
                     js_user_tags=user_tags,  # tags belonging to the user
+                    form=form,
                 )
             else:
                 abort(404)
-    elif request.method == "POST":
+
+    elif form.validate_on_submit:
         # retrieve all the info from the form and save it to the db
         current_note = Note.query.get_or_404(note_id)
         current_note.tags.clear()  # remove all previously saved tags on the note
-        tags_id = request.form.get("note-tags")  # ['2,3,6']
+        tags_id = form.note_tags.data  # ['2,3,6']
         if (
             tags_id
         ):  # allow for when there are no tags because the code below assumes tags
@@ -183,14 +187,28 @@ def note(note_id=None):
         else:  # allow for when there were tags but user removes tags
             tags_id = []
             current_note.tags = tags_id
-        current_note.title = request.form.get("note-title")
-        current_note.body = request.form.get("note-body")
-        current_note.date_modified = datetime.utcnow()
+        current_note.title = form.note_title.data
+
+        current_note.body_delta = bleach.clean(
+            form.note_body_delta.data,
+            tags=allowed_html_tags,
+            attributes=allowed_attributes,
+            css_sanitizer=styles,
+        )
+        # bleaching note_body_html because it is HTML that is displayed on index.HTML
+        current_note.body_html = bleach.clean(
+            form.note_body_html.data,
+            tags=allowed_html_tags,
+            attributes=allowed_attributes,
+            css_sanitizer=styles,
+        )
+
+        current_note.body_text = form.note_body_text.data
+        current_note.date_modified = func.now()
         # current_note.verified = True
         db.session.commit()
         flash("note saved", category="success")
         return redirect(url_for("views.note", note_id=current_note.id))
-    # return render_template("content/note.html", user=current_user, tags=tags)
 
 
 @views.route("/edit-tags", methods=["GET", "POST"])
@@ -202,12 +220,19 @@ def edit_tags():
         .all()
     )
 
-    if request.method == "POST":
-        # new_tags = request.form.to_dict()
+    if request.method == "GET":
+        return render_template("content/edit-tags.html", user=current_user, tags=tags)
 
-        for k, v in request.form.items(
-            multi=True
-        ):  # https://stackoverflow.com/questions/58172414/iterate-over-keys-and-all-values-in-multidict
+    if request.method == "POST":
+        bleached_tags = {
+            bleach.clean(key, strip=True): bleach.clean(value, strip=True)
+            for key, value in request.form.items()
+        }
+
+        for k, v in bleached_tags.items():
+            if k == "csrf_token":
+                continue
+            # https://stackoverflow.com/questions/58172414/iterate-over-keys-and-all-values-in-multidict
             # print(f"{k}, {v}")
             # e.g.
             # parent-1, hobbies
@@ -221,6 +246,7 @@ def edit_tags():
             # new-parent-32769, y32769
             # new-child-2-32769, x2
             # https://stackoverflow.com/questions/73606635/flask-forms-handle-multiple-identical-form-fields
+
             if k.split("-")[1] == "parent":  # new parent
                 counter = 1
                 new_parent_tag = Tag(name=v, level=1, user_id=current_user.id)
@@ -228,14 +254,14 @@ def edit_tags():
                 db.session.commit()
                 # this breaks if there are parent tags with the same name
                 parent = Tag.query.filter_by(name=v).first()
-                for key, value in request.form.items(multi=True):
+                for k2, v2 in bleached_tags.items():
                     if (
-                        key.split("-")[-1] == k.split("-")[-1]
-                        and key.split("-")[1]
+                        k2.split("-")[-1] == k.split("-")[-1]
+                        and k2.split("-")[1]
                         != "parent"  # prevent parent from adding itself
                     ):
                         new_child_tag = Tag(
-                            name=value,
+                            name=v2,
                             level=2,
                             order=counter,
                             parent_tag=parent.id,
@@ -243,7 +269,6 @@ def edit_tags():
                         )
                         db.session.add(new_child_tag)
                         db.session.commit()
-                        print(f"{counter},{value}")
                         counter += 1
 
             elif k.split("-")[0] == "parent":  # existing parent
@@ -252,26 +277,25 @@ def edit_tags():
                 existing_parent_tag = Tag.query.filter_by(id=parent_id).first()
                 existing_parent_tag.name = v
                 db.session.commit()
-                for key, value in request.form.items(multi=True):
+                for k2, v2 in bleached_tags.items():
                     if (
-                        key.split("-")[-1] == parent_id
-                        and key.split("-")[0] != "parent"
+                        k2.split("-")[-1] == parent_id
+                        and k2.split("-")[0] != "parent"
                     ):
-                        if key.split("-")[0] != "new":
-                            child_id = key.split("-")[1]
+                        if k2.split("-")[0] != "new":
+                            child_id = k2.split("-")[1]
                             existing_child_tag = Tag.query.filter_by(
                                 id=child_id
                             ).first()
-                            existing_child_tag.name = value
+                            existing_child_tag.name = v2
                             existing_child_tag.order = counter
                             db.session.commit()
-                            print(f"{counter},{value}")
                             counter += 1
                         elif (
-                            key.split("-")[1] != "parent"
+                            k2.split("-")[1] != "parent"
                         ):  # prevent adding itself as child
                             new_child_tag = Tag(
-                                name=value,
+                                name=v2,
                                 level=2,
                                 order=counter,
                                 parent_tag=parent_id,
@@ -279,7 +303,6 @@ def edit_tags():
                             )
                             db.session.add(new_child_tag)
                             db.session.commit()
-                            print(f"{counter},{value}")
                             counter += 1
 
             elif k == "tags-to-delete":
@@ -295,20 +318,27 @@ def edit_tags():
                         # print(delete_id)
                         # 2 8 7
 
-        flash("saved", category="success")
+        flash("tags updated", category="success")
         return redirect(url_for("views.edit_tags"))
-    return render_template("content/edit-tags.html", user=current_user, tags=tags)
 
 
 @views.route("/delete-note", methods=["POST"])
 @login_required
 def delete_note():
-    note = json.loads(request.data)
-    noteId = note["noteId"]
-    note = Note.query.get(noteId)  # noteId is from index.js
-    if note:
-        if note.user_id == current_user.id:
-            db.session.delete(note)
-            db.session.commit()
-            flash("note deleted", category="success")
-    return jsonify({})
+    try:
+        note_id = request.json.get(
+            "note_id"
+        )  # https://stackoverflow.com/questions/10434599/get-the-data-received-in-a-flask-request
+        print(note_id)
+        note = Note.query.get(note_id)
+        if note:
+            if note.user_id == current_user.id:  # very important!!!!!
+                db.session.delete(note)
+                db.session.commit()
+                flash("note deleted", category="success")
+                return jsonify(
+                    success=True
+                )  # https://stackoverflow.com/questions/26079754/flask-how-to-return-a-success-status-code-for-ajax-call
+    except:
+        flash("error", category="error")
+        jsonify(success=False)
