@@ -141,6 +141,15 @@ insert_head_here %}
   li ol > li:before {
   content: counters(item, ".") " ";
   }
+
+  dialog::backdrop {
+    backdrop-filter: blur(2px);
+  }
+
+  p.big {
+    line-height: 3;
+  }
+
 </style>
 
 {% endblock %} {% block content %}
@@ -211,11 +220,10 @@ insert_head_here %}
 </div>
 <dialog class="tos-dialog" id="js-tos-dialog">
   <h1>Terms of Service</h1>
-  <p>
+  <p class="big">
     By accessing or using our services, you willingly submit to and embrace the
     following terms:
   </p>
-
   <ol>
     <li>
       User Conduct in the Metropolis
@@ -322,8 +330,8 @@ insert_head_here %}
     </li>
   </ol>
   <div class="tos-buttons">
-    <button class="tos-close" type="button" id="js-tos-dialog-close">Reject</button>
-    <button class="tos-accept" type="button" id="js-tos-dialog-close">Accept</button>
+    <button class="tos-close" type="button" id="js-tos-dialog-reject">Reject</button>
+    <button class="tos-accept" type="button" id="js-tos-dialog-accept">Accept</button>
   </div>
 </dialog>
 
@@ -337,9 +345,22 @@ insert_head_here %}
     tosDialog.showModal();
   });
 
-  const closeTosDialog = document.getElementById("js-tos-dialog-close");
-  closeTosDialog.addEventListener("click", () => {
+  const rejectTosDialog = document.getElementById("js-tos-dialog-reject");
+  rejectTosDialog.addEventListener("click", () => {
     tosDialog.close();
+    const checkTos = document.getElementById("cb-tos");
+    if (checkTos.checked) {
+      checkTos.click()
+    }
+  })
+
+  const acceptTosDialog = document.getElementById("js-tos-dialog-accept");
+  acceptTosDialog.addEventListener("click", () => {
+    tosDialog.close();
+    const checkTos = document.getElementById("cb-tos");
+    if (!checkTos.checked) {
+      checkTos.click()
+    }
   })
 
   var tween = KUTE.fromTo(

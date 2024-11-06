@@ -17,11 +17,11 @@ def create_app():
     app.config.from_mapping(
         FLASK_DEBUG = True,
         SECRET_KEY = "james_charles",
-        SQLALCHEMY_DATABASE_URI = "sqlite:///housing.db",
+        SQLALCHEMY_DATABASE_URI = "sqlite:///DATABASE.db",
         SQLALCHEMY_TRACK_MODIFICATIONS = True,
         SQLALCHEMY_ECHO = True
     )
-    # for production
+    # https://hackersandslackers.com/configure-flask-applications/
     app.config.from_object('config.Config') 
 
     db.init_app(app)

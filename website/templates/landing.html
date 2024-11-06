@@ -185,8 +185,8 @@ insert_head_here %}
     width: 100%;
     display: flex;
     align-items: center;
-    padding: 1em;
-    font: 2rem Poppins;
+    padding: 0.8em 1em;
+    font: 1.7rem Poppins;
     color: var(--text);
     background-color: hsla(322, 100%, 50%, 0.2);
   }
@@ -195,10 +195,15 @@ insert_head_here %}
     background-color: hsla(322, 100%, 50%, 0.8);
   }  
 
+  .bento-tertiary-icon {
+    height: 100%;
+    padding-top: 0.2em;
+    padding-right: 0.2em;
+  }
+
   .bento-tertiary i {
     color: var(--text);
-    font-size: 3rem;
-    float: left;
+    font-size: 2.4rem;
   }
 </style>
 {% endblock %} {% block content %}
@@ -241,8 +246,8 @@ insert_head_here %}
     </div>
     <div class="bento-secondary">
       <p>
-        No folders here, just tags. Our app is a powerful way for taking notes
-        and making connections between them.
+        No folders here, just tags. ByteMemo is a powerful way for taking notes
+        and making important connections.
       </p>
       <a class="cta" href="{{ url_for('auth.signup') }}">
         SIGN UP
@@ -250,10 +255,12 @@ insert_head_here %}
       </a>
     </div>
     <div class="bento-tertiary">
+      <div class="bento-tertiary-icon">
+        <i class="bx bx-merge"></i>
+      </div>
       <div>
-        <i class="bx bxs-layer"></i>
         <p>
-          &nbsp; Two layers of tags allow for easy access to all your ideas.
+          Two layers of tags optimizes the connection and generation of ideas.
         </p>
       </div>
     </div>
